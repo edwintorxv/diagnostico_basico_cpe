@@ -2,7 +2,7 @@ package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.adapter;
 
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteRequest;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.PollerPortOut;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Component
 @RequiredArgsConstructor
-public class PollerAdapter implements PollerPortOut {
+public class PollerAdapter implements IPollerPortOut {
 
     private final RestTemplate restTemplate;
 
