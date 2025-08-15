@@ -4,7 +4,7 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.Inventario
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteResponse;
 
 
-public interface PollerPortOut {
+public interface IPollerPortOut {
 
     InventarioPorClienteResponse obtenerInventarioPorCliente(InventarioPorClienteRequest request) throws Exception;
 
