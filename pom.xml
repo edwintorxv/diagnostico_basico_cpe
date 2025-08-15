@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.5.4</version>
+		<relativePath/>
+	</parent>
+
+	<groupId>co.com.claro</groupId>
+	<artifactId>ms_diagnostico_basico_cpe</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>ms_diagnostico_basico_cpe</name>
+	<description>ms_diagnostico_basico_cpe</description>
+
+	<properties>
+		<!-- Define la versión de Java que se usará en la compilación -->
+		<java.version>17</java.version>
+		<!-- Formato de la fecha de compilación que se inyectará con maven.build.timestamp.format -->
+		<maven.build.timestamp.format>yyyy-MM-dd HH:mm:ss z</maven.build.timestamp.format>
+		<maven.build.timestamp.timezone>America/Bogota</maven.build.timestamp.timezone>
+	</properties>
+
+	<!-- Sección que contiene todas las dependencias necesarias para el proyecto -->
+	<dependencies>
+
+		<!--
+            Proporciona todas las bibliotecas necesarias para crear aplicaciones web con Spring Boot:
+            - Incluye Spring MVC, Tomcat embebido y utilidades de desarrollo web.
+            - Excluye spring-boot-starter-logging porque se usará Log4j2 como sistema de logging.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!--
+            Proporciona soporte para pruebas unitarias e integración con:
+            - JUnit Jupiter (JUnit 5), Mockito, AssertJ y otras utilidades de testeo en Spring.
+            - Solo se utiliza en tiempo de compilación y ejecución de tests (scope=test).
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<!--
+            Facilita la generación automática de código repetitivo en tiempo de compilación:
+            - Anotaciones como @Getter, @Setter, @NoArgsConstructor, @AllArgsConstructor, @Builder, etc.
+            - Se marca como opcional porque no es necesario en tiempo de ejecución; solo en la compilación del proyecto.
+        -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+		<!--
+            Proporciona validación de datos con Bean Validation (JSR 380):
+            - Incluye Hibernate Validator y las anotaciones de validación como @NotNull, @Size, @Email, etc.
+            - Permite validar DTOs y entidades antes de persistir o procesar la información.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+		</dependency>
+
+		<!--
+            Brinda soporte para la seguridad de la aplicación con Spring Security:
+            - Incluye filtros, configuración de autenticación y autorización básica.
+            - Se puede extender para JWT, OAuth2 o LDAP según la configuración adicional.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+
+		<!--
+            Permite generar documentación interactiva OpenAPI/Swagger para los endpoints REST:
+            - Proporciona la interfaz de usuario Swagger UI para explorar y probar la API.
+            - Está basado en springdoc-openapi, que escanea automáticamente los controladores y modelos.
+        -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.6</version>
+		</dependency>
+
+		<!--
+            Proporciona las bibliotecas necesarias para que la aplicación funcione como servidor de recursos OAuth2:
+            - Incluye soporte para validar y procesar JWT (JSON Web Tokens) entrantes.
+            - Permite configurar filtros de autorización basados en tokens.
+        -->
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-resource-server</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-oauth2-jose</artifactId>
+		</dependency>
+
+		<!--
+            Proporciona soporte para persistencia de datos con Spring Data JPA:
+            - Incluye Hibernate como proveedor de JPA, manejo de transacciones y repositorios.
+            - Permite definir interfaces que extienden JpaRepository para CRUD y consultas personalizadas.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!--
+            Driver JDBC oficial de Oracle (ojdbc11) para establecer conexión con bases de datos Oracle:
+            - Necesario en tiempo de ejecución (scope=runtime) para operaciones de lectura/escritura en Oracle.
+        -->
+		<dependency>
+			<groupId>com.oracle.database.jdbc</groupId>
+			<artifactId>ojdbc11</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!--
+            Biblioteca de Google para serializar y deserializar objetos Java a JSON y viceversa:
+            - Permite convertir POJOs en cadenas JSON y parsear JSON en instancias de clases.
+        -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+
+		<!--
+            Proporciona Log4j2 como sistema de logging en lugar de Logback (predeterminado en Spring Boot):
+            - Incluye la configuración básica de Log4j2 para permitir un control más avanzado del logging.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-log4j2</artifactId>
+		</dependency>
+
+		<!--
+            Activa los endpoints de monitoreo y métricas de Spring Boot Actuator:
+            - Permite exponer información de salud (health), métricas (metrics), info, env, entre otros.
+            - Se excluye Logback (logback-classic) para evitar conflictos, ya que se usa Log4j2.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>ch.qos.logback</groupId>
+					<artifactId>logback-classic</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<!--
+            Proporciona las anotaciones estándar de Java para ciclos de vida y otros propósitos:
+            - Incluye @PostConstruct, @PreDestroy, @Resource y otras anotaciones de javax.annotation.
+            - Útil para ejecutar métodos después de la construcción del bean o antes de su destrucción.
+        -->
+		<dependency>
+			<groupId>javax.annotation</groupId>
+			<artifactId>javax.annotation-api</artifactId>
+			<version>1.3.2</version>
+		</dependency>
+
+		<!--
+            Permite la serialización y deserialización de objetos en formato XML usando Jackson:
+            - Soporta anotaciones específicas de Jackson para XML.
+            - Útil si se requiere intercambiar información en formato XML con otros sistemas.
+        -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+			<version>2.17.1</version>
+		</dependency>
+
+		<!--
+            Proporciona soporte para Programación Orientada a Aspectos (AOP) en Spring:
+            - Permite definir aspectos, pointcuts y advice para tareas transversales como logging, transacciones, etc.
+            - Incluye la infraestructura de AspectJ para el weaving de aspectos en tiempo de ejecución.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-aop</artifactId>
+		</dependency>
+
+		<!--
+            Biblioteca de Apache Commons para manipulación avanzada de texto:
+            - Incluye utilidades como StringSubstitutor, WordUtils, StringEscapeUtils, entre otras.
+            - Facilita operaciones de formateo, escape y manipulación de cadenas.
+        -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
+			<version>1.11.0</version>
+		</dependency>
+
+		<!--
+            Soporte para WebSocket en aplicaciones Spring Boot:
+            - Permite crear endpoints WebSocket para comunicación bidireccional en tiempo real.
+            - Incluye las clases necesarias para configurar STOMP o sockets puros.
+        -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
+		<!-- Dependencia para MapStruct, una herramienta de mapeo de Java beans -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>1.5.5.Final</version>
+		</dependency>
+
+		<!-- Dependencia del procesador de MapStruct -->
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct-processor</artifactId>
+			<version>1.5.5.Final</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Dependencia para usar Mono -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+		</dependency>
+
+	</dependencies>
+
+
+	<!-- Configuración del proceso de compilación, empaquetado y plugins de Maven -->
+	<build>
+		<plugins>
+			<!-- Plugin de Spring Boot que permite empaquetar la aplicación como un archivo ejecutable (fat jar) -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<!-- Exclusión de Lombok en el empaquetado final para no incluirlo dentro del jar/war -->
+					<excludes>
+						<exclude>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<!-- Plugin para inyectar la fecha de compilación y otras variables en los recursos -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.2.0</version>
+				<configuration>
+					<!-- Define el delimitador @ para poder filtrar variables en los archivos de recursos -->
+					<delimiters>@</delimiters>
+					<useDefaultDelimiters>true</useDefaultDelimiters>
+				</configuration>
+			</plugin>
+		</plugins>
+
+		<!-- Sección de recursos que serán filtrados para inyectar variables como la fecha de compilación -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<!-- Habilita el filtrado de los recursos para inyectar valores de las propiedades -->
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+	</build>
+</project>
+

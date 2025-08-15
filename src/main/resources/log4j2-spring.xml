@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="info" monitorInterval="1" name="PropertiesConfig">
+    <!-- Definición de propiedades que se utilizan en la configuración -->
+    <Properties>
+        <property name="basePath">${bundle:application:spring.logging.path}</property>
+        <property name="nameApp">${bundle:application:spring.application.name}</property>
+        <property name="pattern">[%-5level][%-20X{UUID}][%d{dd/MM/yyyy HH:mm:ss.SSS}][%-20X{dynamicClass}][%-20X{dynamicMethod}][%F:%M:%L]%m%n</property>
+    </Properties>
+
+    <!-- Definición de los apéndices que se utilizan para la salida de los registros -->
+    <Appenders>
+        <!-- Apéndice de archivo con rotación basado en tamaño y tiempo -->
+        <RollingFile name="fileLogger" fileName="${basePath}/${nameApp}/${nameApp}.log"
+                     filePattern="${basePath}/${nameApp}/${nameApp}-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${pattern}" charset="UTF-8"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <DefaultRolloverStrategy>
+                <Delete basePath="${basePath}/${nameApp}" maxDepth="10">
+                    <IfLastModified age="30D"/>
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <!-- Apéndice para salida en consola -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern}" charset="UTF-8"/>
+        </Console>
+
+        <!-- Apéndices asíncronos que referencian a los appenders reales -->
+        <Async name="AsyncFile">
+            <AppenderRef ref="fileLogger"/>
+        </Async>
+
+        <Async name="AsyncConsole">
+            <AppenderRef ref="Console"/>
+        </Async>
+
+    </Appenders>
+
+    <!-- Configuración de los loggers -->
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="AsyncFile"/>
+            <AppenderRef ref="AsyncConsole"/>
+        </Root>
+    </Loggers>
+
+</Configuration>
