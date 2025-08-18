@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ConsultarParametrosDipositivos {
+public class ConsultarParametrosDipositivosService {
 
     private final IAcsPortOut iAcsPortOut;
 
