@@ -10,12 +10,16 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusR
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStrategy {
@@ -33,63 +37,79 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
     }
 
     @Override
-    public DiagnosticoFtthResponse diagnosticar(String cuentaCliente,
-                                                List<InventarioPorClienteDto> inventario,
+    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto topologia,
                                                 IAcsPortOut acsPortOut) {
 
-        try {
-            List<String> seriales = inventario.stream()
-                    .map(InventarioPorClienteDto::getSerialNumber)
-                    .toList();
+        final String cuentaCliente = topologia.getCuentaCliente();
 
-            // 1. Buscar ONT principal
-            InventarioPorClienteDto cpePrincipal = inventario.stream()
-                    .filter(i -> "ftth".equalsIgnoreCase(i.getProducto()))
-                    .findFirst()
-                    .orElse(null);
+        try {
+
+            InventarioPorClienteDto cpePrincipal = topologia.getInventarioCPE();
+            List<InventarioPorClienteDto> meshList = Optional.ofNullable(topologia.getLstinventarioMesh())
+                    .orElseGet(List::of);
 
             if (cpePrincipal == null) {
                 return errorInventario(cuentaCliente);
             }
 
+            List<InventarioPorClienteDto> equipos = new ArrayList<>();
+            equipos.add(cpePrincipal);
+            equipos.addAll(meshList);
+
+
+            List<String> seriales = equipos.stream()
+                    .map(this::serialInventarioNormalizado) // toma serialNumber o serialMac
+                    .filter(Objects::nonNull)
+                    .toList();
+
+
             DeviceParamsDto dtoOnt = buildDeviceParamsDto(
                     cpePrincipal.getSerialNumber(),
-                    String.format(Constantes.KEY_OR_TREE_ONT, cpePrincipal.getMarca().toLowerCase(),
-                            cpePrincipal.getModelo().replace(" ", "-").toLowerCase()),
+                    String.format(Constantes.KEY_OR_TREE_ONT,
+                            safeLower(cpePrincipal.getMarca()),
+                            safeLower(cpePrincipal.getModelo()).replace(" ", "-")),
                     cpePrincipal.getMarca(),
                     cpePrincipal.getModelo()
             );
 
             DeviceStatusResponse deviceStatus = acsPortOut.obtenerEstadoPorSerial(cpePrincipal.getSerialNumber());
-
-            DeviceStatusDto statusDto = deviceStatus.getData().get(0);
-
-            if ("false".equalsIgnoreCase(statusDto.getOnline())) {
+            if (deviceStatus == null || deviceStatus.getData() == null || deviceStatus.getData().isEmpty()) {
                 return diagnostico(cuentaCliente,
                         Constantes.ONT_NO_ONLINE_CODIGO,
                         Constantes.ONT_NO_ONLINE_DESCRIPCION);
             }
 
+            DeviceStatusDto statusDto = deviceStatus.getData().get(0);
+            if (statusDto == null || "false".equalsIgnoreCase(statusDto.getOnline())) {
+                return diagnostico(cuentaCliente,
+                        Constantes.ONT_NO_ONLINE_CODIGO,
+                        Constantes.ONT_NO_ONLINE_DESCRIPCION);
+            }
+
+            // 2) Parámetros ONT
             DeviceParamsResponse responseOnt = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoOnt);
             if (isAcsDataEmpty(responseOnt)) {
                 return diagnostico(cuentaCliente,
                         Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION
-                );
+                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
             }
 
-            List<String> macsOnt = macAdreesValidator.macAddressDetectadas(responseOnt, dtoOnt.getKeyOrTree());
+            List<String> macsOnt = normalizarListaMac(
+                    macAdreesValidator.macAddressDetectadas(responseOnt, dtoOnt.getKeyOrTree())
+            );
+
             boolean wifiOntOk = canalWifiValidator.validar(responseOnt, dtoOnt.getKeyOrTree());
 
-            // 3. Validar cantidad de MAC conectadas a ONT
-            if (macsOnt.stream().filter(seriales::contains).count() > 1) {
+            // 3) Validar cantidad de MAC conectadas a ONT
+            long conteoCoincidenciasOnt = macsOnt.stream().filter(seriales::contains).count();
+            if (conteoCoincidenciasOnt > 1) {
                 return diagnostico(cuentaCliente,
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO,
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION);
             }
 
-            // 4. Buscar AP maestro en inventario
-            InventarioPorClienteDto meshMaster = findInventarioCoincidente(inventario, macsOnt);
+            // 4) Buscar AP maestro en inventario
+            InventarioPorClienteDto meshMaster = findInventarioCoincidente(equipos, macsOnt);
             if (meshMaster == null) {
                 return diagnostico(cuentaCliente,
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO,
@@ -97,29 +117,30 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             }
 
             // Validar estado AP maestro
-            if (!estaOnline(meshMaster.getSerialMac(), acsPortOut)) {
+            if (!estaOnline(serialPreferido(meshMaster), acsPortOut)) {
                 return diagnostico(cuentaCliente,
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO,
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION);
             }
 
-            // 5. Consultar parámetros AP maestro
+            // 5) Consultar parámetros AP maestro
             DeviceParamsDto dtoMesh = buildDeviceParamsDto(
-                    meshMaster.getSerialMac(),
+                    serialPreferido(meshMaster),
                     Constantes.KEY_OR_TREE_MESH,
-                    meshMaster.getMarca().toLowerCase(),
-                    meshMaster.getModelo().toLowerCase()
+                    safeLower(meshMaster.getMarca()),
+                    meshMaster.getModelo()
             );
 
             DeviceParamsResponse responseMesh = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoMesh);
             if (isAcsDataEmpty(responseMesh)) {
                 return diagnostico(cuentaCliente,
                         Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION
-                );
+                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
             }
 
-            List<String> macsMesh = macAdreesValidator.macAddressDetectadas(responseMesh, dtoMesh.getKeyOrTree());
+            List<String> macsMesh = normalizarListaMac(
+                    macAdreesValidator.macAddressDetectadas(responseMesh, dtoMesh.getKeyOrTree())
+            );
 
             if (macsMesh.stream().filter(seriales::contains).count() == 0) {
                 return diagnostico(cuentaCliente,
@@ -127,28 +148,30 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION);
             }
 
-            // 6. Buscar AP esclavo
-            InventarioPorClienteDto meshSlave = findInventarioCoincidente(inventario, macsMesh);
-            if (meshSlave == null) return errorInventario(cuentaCliente);
+            // 6) Buscar AP esclavo
+            InventarioPorClienteDto meshSlave = findInventarioCoincidente(equipos, macsMesh);
+            if (meshSlave == null) {
+                return errorInventario(cuentaCliente);
+            }
 
             // Consultar AP esclavo
             DeviceParamsDto dtoSlave = buildDeviceParamsDto(
-                    meshSlave.getSerialMac(),
+                    serialPreferido(meshSlave),
                     Constantes.KEY_OR_TREE_MESH,
                     meshMaster.getMarca(),
                     meshMaster.getModelo()
             );
+
             DeviceParamsResponse responseSlave = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoSlave);
             if (isAcsDataEmpty(responseSlave)) {
                 return diagnostico(cuentaCliente,
                         Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION
-                );
+                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
             }
 
             boolean wifiSlaveOk = canalWifiValidator.validar(responseSlave, dtoSlave.getKeyOrTree());
 
-            // 7. Diagnósticos finales de canales
+            // 7) Diagnósticos finales de canales
             if (!wifiSlaveOk) {
                 return diagnostico(cuentaCliente,
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
@@ -164,7 +187,9 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO,
                         Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION);
             }
+
             return errorInventario(cuentaCliente);
+
 
         } catch (Exception e) {
             return new DiagnosticoFtthResponse(
@@ -239,6 +264,33 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                 || response.getData().isEmpty()
                 || response.getData().get(0).getParams() == null
                 || response.getData().get(0).getParams().isEmpty();
+    }
+
+    private String norm(String s) {
+        return (s == null) ? null : s.replace(":", "").toUpperCase();
+    }
+
+    private String safeLower(String s) {
+        return s == null ? "" : s.toLowerCase();
+    }
+
+    private String serialInventarioNormalizado(InventarioPorClienteDto i) {
+        // Usa serialNumber si existe; si no, serialMac
+        String raw = (i.getSerialNumber() != null && !i.getSerialNumber().isEmpty())
+                ? i.getSerialNumber()
+                : i.getSerialMac();
+        return norm(raw);
+    }
+
+    private List<String> normalizarListaMac(List<String> macs) {
+        if (macs == null) return List.of();
+        return macs.stream().map(this::norm).filter(Objects::nonNull).toList();
+    }
+
+    private String serialPreferido(InventarioPorClienteDto i) {
+        return (i.getSerialMac() != null && !i.getSerialMac().isEmpty())
+                ? i.getSerialMac()
+                : i.getSerialNumber();
     }
 
 }

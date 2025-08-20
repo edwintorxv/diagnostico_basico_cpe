@@ -4,7 +4,7 @@ public class Constantes {
 
     public static final String REQUEST_MAPPING = "diagres/diagnosticoBasicoCPE";
 
-    public static final String INVENTARIO_NO_ENCONTRADO_CODIGO = "2";
+    public static final String INVENTARIO_NO_ENCONTRADO_CODIGO = "600";
     public static final String INVENTARIO_NO_ENCONTRADO_DESCRIPCION = "La cuenta ingresada %s no existe ";
 
     //Mensajes de respuesta por validación
@@ -39,10 +39,10 @@ public class Constantes {
     public static final String KEY_OR_TREE_MESH = "diagres-diagbasic-meshs-%s-%s";
 
 
-    public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO = "1000";
+    public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO = "600";
     public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION = "No se encuentra el AP maestro";
 
-    public static final String ACS_NO_REPORTA_DATA_CODIGO = "1001";
+    public static final String ACS_NO_REPORTA_DATA_CODIGO = "600";
     public static final String ACS_NO_REPORTA_DATA_DESCRIPCION = "ACS no reporta data";
 
 

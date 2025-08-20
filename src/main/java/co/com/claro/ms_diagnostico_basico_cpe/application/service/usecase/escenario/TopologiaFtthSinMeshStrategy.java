@@ -9,6 +9,7 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusR
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
@@ -29,30 +30,26 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
     }
 
     @Override
-    public DiagnosticoFtthResponse diagnosticar(String cuentaCliente,
-                                                List<InventarioPorClienteDto> inventario,
-                                                IAcsPortOut acsPortOut) {
-
+    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto inventario, IAcsPortOut acsPortOut) {
+        String cuentaCliente = inventario.getCuentaCliente();
         try {
 
-            InventarioPorClienteDto cpePrincipal = inventario.stream()
-                    .filter(i -> "ftth".equalsIgnoreCase(i.getProducto()))
-                    .findFirst()
-                    .orElse(null);
+            // CPE principal viene del DTO directamente
+            InventarioPorClienteDto cpePrincipal = inventario.getInventarioCPE();
 
             if (cpePrincipal == null) {
-                return new DiagnosticoFtthResponse(
-                        "OK",
-                        ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                        List.of(new DiagnosticoFtthDto(
-                                cuentaCliente,
-                                "CPE_NO_ENCONTRADO",
-                                "No se encontró equipo principal FTTH en inventario"
-                        ))
-                );
+                return diagnostico(cuentaCliente,
+                        "CPE_NO_ENCONTRADO",
+                        "No se encontró equipo principal FTTH en inventario");
             }
 
             DeviceStatusResponse deviceStatus = acsPortOut.obtenerEstadoPorSerial(cpePrincipal.getSerialNumber());
+            if (deviceStatus == null || deviceStatus.getData().isEmpty()) {
+                return diagnostico(cuentaCliente,
+                        "SIN_RESPUESTA_ACS",
+                        "No se pudo obtener estado del CPE en ACS");
+            }
+
 
             DeviceStatusDto statusDto = deviceStatus.getData().get(0);
 

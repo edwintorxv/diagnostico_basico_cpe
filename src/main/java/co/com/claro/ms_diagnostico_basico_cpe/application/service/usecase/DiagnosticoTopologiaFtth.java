@@ -8,6 +8,7 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.Diagn
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteRequest;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.diagnostico.IDiagnosticoFTTHPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
@@ -27,35 +28,17 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
 
     private final TopologiaFtthSinMeshStrategy ftthSinMeshsStrategy;
     private final TopologiaFtthConMeshStrategy ftthConMeshsStrategy;
+    //private final InventarioPorTopoligiaDto inventarioPoller;
+    private final InventarioPoller inventarioPoller;
 
     @Override
     public DiagnosticoFtthResponse diagnosticoTopologiaFtth(String cuentaCliente) throws Exception {
 
-        InventarioPorClienteRequest inventarioRequest = new InventarioPorClienteRequest();
-        inventarioRequest.setCuenta(cuentaCliente);
 
-        InventarioPorClienteResponse inventarioPorClienteResponse =
-                pollerPortOut.obtenerInventarioPorCliente(inventarioRequest);
+        InventarioPorTopoligiaDto inventarioTopologiaFtth =
+                inventarioPoller.consultarInventario(cuentaCliente, "ftth");
 
-        if (inventarioPorClienteResponse == null || inventarioPorClienteResponse.getData().isEmpty()) {
-            return new DiagnosticoFtthResponse(
-                    "OK",
-                    ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                    List.of(new DiagnosticoFtthDto(
-                            cuentaCliente,
-                            Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
-                            Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION
-                    ))
-            );
-        }
-
-        List<InventarioPorClienteDto> inventarioCliente = inventarioPorClienteResponse.getData();
-
-        List<InventarioPorClienteDto> cpePrincipal = inventarioCliente.stream()
-                .filter(i -> "ftth".equalsIgnoreCase(i.getProducto()))
-                .toList();
-
-        if (cpePrincipal.isEmpty()) {
+        if (inventarioTopologiaFtth == null || inventarioTopologiaFtth.getInventarioCPE() == null) {
             return new DiagnosticoFtthResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
@@ -67,14 +50,11 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
             );
         }
 
-        List<InventarioPorClienteDto> equiposAdicionales = inventarioCliente.stream()
-                .filter(i -> !"ftth".equalsIgnoreCase(i.getProducto()))
-                .toList();
+        DiagnosticoTopologiaFtthStrategy strategy =
+                (inventarioTopologiaFtth.getLstinventarioMesh() == null || inventarioTopologiaFtth.getLstinventarioMesh().isEmpty())
+                        ? ftthSinMeshsStrategy
+                        : ftthConMeshsStrategy;
 
-        DiagnosticoTopologiaFtthStrategy strategy = equiposAdicionales.isEmpty()
-                ? ftthSinMeshsStrategy
-                : ftthConMeshsStrategy;
-
-        return strategy.diagnosticar(cuentaCliente, inventarioCliente, acsPortOut);
+        return strategy.diagnosticar(inventarioTopologiaFtth, acsPortOut);
     }
 }
