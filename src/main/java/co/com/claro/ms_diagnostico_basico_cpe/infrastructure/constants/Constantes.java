@@ -2,14 +2,14 @@ package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants;
 
 public class Constantes {
 
-    public static final String REQUEST_MAPPING = "/diagnosticoBasicoCPE";
+    public static final String REQUEST_MAPPING = "diagres/diagnosticoBasicoCPE";
 
     public static final String INVENTARIO_NO_ENCONTRADO_CODIGO = "2";
     public static final String INVENTARIO_NO_ENCONTRADO_DESCRIPCION = "La cuenta ingresada %s no existe ";
 
     //Mensajes de respuesta por validación
     public static final String ONT_NO_ONLINE_CODIGO = "300";
-    public static final String ONT_NO_OFFLINE_DESCRIPCION = "No es posible consultar la ONT.";
+    public static final String ONT_NO_ONLINE_DESCRIPCION = "No es posible consultar la ONT.";
 
     public static final String ONT_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_CODIGO = "601";
     public static final String ONT_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_DESCRIPCION = "Topología de ONT correcta";
@@ -20,8 +20,8 @@ public class Constantes {
     public static final String ONT_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO = "603";
     public static final String ONT_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION = "Se detecta problema en Topología por más de 1 AP Maestro";
 
-    public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_CODIGO = "604";
-    public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_DESCRIPCION = "No se detecta UltraWiFi operativo, se debe validar daño y/o garantía de este";
+    public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO = "604";
+    public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION = "No se detecta UltraWiFi operativo, se debe validar daño y/o garantía de este";
 
     public static final String ONT_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO = "605";
     public static final String ONT_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION = "No se encuentra AP Esclavo en la topología";
@@ -36,6 +36,15 @@ public class Constantes {
     public static final String ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION = "Topología de ONT y UltraWiFi Correcta";
 
     public static final String KEY_OR_TREE_ONT = "diagres-diagbasic-ont-%s-%s";
-    public static final String KEY_OR_TREE_MESH = "diagres-diagbasic-mesh-";
+    public static final String KEY_OR_TREE_MESH = "diagres-diagbasic-meshs-%s-%s";
+
+
+    public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO = "1000";
+    public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION = "No se encuentra el AP maestro";
+
+    public static final String ACS_NO_REPORTA_DATA_CODIGO = "1001";
+    public static final String ACS_NO_REPORTA_DATA_DESCRIPCION = "ACS no reporta data";
+
+
 
 }

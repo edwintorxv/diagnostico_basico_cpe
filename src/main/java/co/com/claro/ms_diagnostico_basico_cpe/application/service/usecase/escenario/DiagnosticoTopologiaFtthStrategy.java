@@ -1,14 +1,14 @@
 package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario;
 
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFTTHResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 
 import java.util.List;
 
-public interface DiagnosticoStrategy {
+public interface DiagnosticoTopologiaFtthStrategy {
 
-    DiagnosticoFTTHResponse diagnosticar(String cuentaCliente,
+    DiagnosticoFtthResponse diagnosticar(String cuentaCliente,
                                          List<InventarioPorClienteDto> inventario,
                                          IAcsPortOut acsPortOut);
 

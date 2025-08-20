@@ -1,9 +1,10 @@
 package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase;
 
-import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.DiagnosticoStrategy;
-import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.FtthConMeshStrategy;
-import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.FtthSinMeshStrategy;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFTTHResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.DiagnosticoTopologiaFtthStrategy;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaFtthConMeshStrategy;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaFtthSinMeshStrategy;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteRequest;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteResponse;
@@ -11,6 +12,7 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.diagnostico.IDiagno
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +20,16 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class DiagnosticoFTTHService implements IDiagnosticoFTTHPortIn {
+public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
 
     private final IAcsPortOut acsPortOut;
     private final IPollerPortOut pollerPortOut;
 
-    private final FtthSinMeshStrategy ftthSinMeshsStrategy;
-    private final FtthConMeshStrategy ftthConMeshsStrategy;
+    private final TopologiaFtthSinMeshStrategy ftthSinMeshsStrategy;
+    private final TopologiaFtthConMeshStrategy ftthConMeshsStrategy;
 
     @Override
-    public DiagnosticoFTTHResponse diagnosticar(String cuentaCliente) throws Exception {
+    public DiagnosticoFtthResponse diagnosticoTopologiaFtth(String cuentaCliente) throws Exception {
 
         InventarioPorClienteRequest inventarioRequest = new InventarioPorClienteRequest();
         inventarioRequest.setCuenta(cuentaCliente);
@@ -36,10 +38,14 @@ public class DiagnosticoFTTHService implements IDiagnosticoFTTHPortIn {
                 pollerPortOut.obtenerInventarioPorCliente(inventarioRequest);
 
         if (inventarioPorClienteResponse == null || inventarioPorClienteResponse.getData().isEmpty()) {
-            return new DiagnosticoFTTHResponse(
-                    cuentaCliente,
-                    Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
-                    Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION
+            return new DiagnosticoFtthResponse(
+                    "OK",
+                    ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
+                    List.of(new DiagnosticoFtthDto(
+                            cuentaCliente,
+                            Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
+                            Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION
+                    ))
             );
         }
 
@@ -50,10 +56,14 @@ public class DiagnosticoFTTHService implements IDiagnosticoFTTHPortIn {
                 .toList();
 
         if (cpePrincipal.isEmpty()) {
-            return new DiagnosticoFTTHResponse(
-                    cuentaCliente,
-                    Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
-                    Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION
+            return new DiagnosticoFtthResponse(
+                    "OK",
+                    ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
+                    List.of(new DiagnosticoFtthDto(
+                            cuentaCliente,
+                            Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
+                            String.format(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, cuentaCliente)
+                    ))
             );
         }
 
@@ -61,7 +71,7 @@ public class DiagnosticoFTTHService implements IDiagnosticoFTTHPortIn {
                 .filter(i -> !"ftth".equalsIgnoreCase(i.getProducto()))
                 .toList();
 
-        DiagnosticoStrategy strategy = equiposAdicionales.isEmpty()
+        DiagnosticoTopologiaFtthStrategy strategy = equiposAdicionales.isEmpty()
                 ? ftthSinMeshsStrategy
                 : ftthConMeshsStrategy;
 
