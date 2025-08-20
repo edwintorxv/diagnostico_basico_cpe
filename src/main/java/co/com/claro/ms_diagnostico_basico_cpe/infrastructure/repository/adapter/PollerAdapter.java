@@ -1,4 +1,4 @@
-package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.adapter;
+package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.repository.adapter;
 
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteRequest;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteResponse;

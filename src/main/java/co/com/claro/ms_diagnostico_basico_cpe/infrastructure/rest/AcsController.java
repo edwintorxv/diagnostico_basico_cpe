@@ -1,7 +1,7 @@
 package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.rest;
 
-import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.ConsultarEstadoDevice;
-import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.ConsultarParametrosDipositivos;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.ConsultarEstadoDispositivoService;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.ConsultarParametrosDipositivosService;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusResponse;
@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class AcsController {
 
-    private final ConsultarEstadoDevice consultarEstadoDevice;
-    private final ConsultarParametrosDipositivos consultarParametrosDipositivos;
+    private final ConsultarEstadoDispositivoService consultarEstadoDispositivoService;
+    private final ConsultarParametrosDipositivosService consultarParametrosDipositivosService;
 
     @GetMapping("/deviceStatus/{serial}")
     public ResponseEntity<DeviceStatusResponse> obetenerEstado(@PathVariable String serial) throws Exception {
-        return ResponseEntity.ok(consultarEstadoDevice.validarEstado(serial));
+        return ResponseEntity.ok(consultarEstadoDispositivoService.validarEstado(serial));
     }
 
 
     @PostMapping("/deviceParams")
     public ResponseEntity<DeviceParamsResponse> obtenerParametros(@RequestBody DeviceParamsDto deviceParamsDto) throws Exception {
-        return ResponseEntity.ok(consultarParametrosDipositivos.consultarParametrosDispositivo(deviceParamsDto));
+        return ResponseEntity.ok(consultarParametrosDipositivosService.consultarParametrosDispositivo(deviceParamsDto));
     }
 
 }
