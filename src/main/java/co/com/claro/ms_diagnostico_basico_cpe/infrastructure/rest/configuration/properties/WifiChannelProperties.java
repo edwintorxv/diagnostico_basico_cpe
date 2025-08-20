@@ -28,9 +28,4 @@ public class WifiChannelProperties {
         return channels.getOrDefault(key, List.of());
     }
 
-    @PostConstruct
-    public void init() {
-        System.out.println("===== PROPIEDADES CARGADAS =====");
-        channels.forEach((k, v) -> System.out.println(k + " -> " + v));
-    }
 }
