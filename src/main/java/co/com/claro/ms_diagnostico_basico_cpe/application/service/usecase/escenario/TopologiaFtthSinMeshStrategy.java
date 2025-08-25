@@ -6,8 +6,8 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsD
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
@@ -30,7 +30,7 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
     }
 
     @Override
-    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto inventario, IAcsPortOut acsPortOut) {
+    public DiagnosticoResponse diagnosticar(InventarioPorTopoligiaDto inventario, IAcsPortOut acsPortOut) {
         String cuentaCliente = inventario.getCuentaCliente();
         try {
 
@@ -61,10 +61,10 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
 
             if (deviceStatus == null) {
 
-                return new DiagnosticoFtthResponse(
+                return new DiagnosticoResponse(
                         "OK",
                         ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                        List.of(new DiagnosticoFtthDto(
+                        List.of(new DiagnosticoDto(
                                 cuentaCliente,
                                 "SIN_RESPUESTA_ACS",
                                 "No se pudo obtener estado del CPE en ACS"
@@ -94,10 +94,10 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
 
             if (wifiOk) {
 
-                return new DiagnosticoFtthResponse(
+                return new DiagnosticoResponse(
                         "OK",
                         ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                        List.of(new DiagnosticoFtthDto(
+                        List.of(new DiagnosticoDto(
                                 cuentaCliente,
                                 Constantes.ONT_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_CODIGO,
                                 Constantes.ONT_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_DESCRIPCION
@@ -105,10 +105,10 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
                 );
             } else {
 
-                return new DiagnosticoFtthResponse(
+                return new DiagnosticoResponse(
                         "OK",
                         ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                        List.of(new DiagnosticoFtthDto(
+                        List.of(new DiagnosticoDto(
                                 cuentaCliente,
                                 Constantes.ONT_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
                                 Constantes.ONT_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION
@@ -117,10 +117,10 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
             }
 
         } catch (Exception e) {
-            return new DiagnosticoFtthResponse(
+            return new DiagnosticoResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                    List.of(new DiagnosticoFtthDto(cuentaCliente,
+                    List.of(new DiagnosticoDto(cuentaCliente,
                             "ERROR_INTERNO",
                             "Error ejecutando diagnóstico: " + e.getMessage()
                     ))
@@ -128,10 +128,10 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
         }
     }
 
-    private DiagnosticoFtthResponse diagnostico(String cuenta, String codigo, String descripcion) {
-        return new DiagnosticoFtthResponse("OK",
+    private DiagnosticoResponse diagnostico(String cuenta, String codigo, String descripcion) {
+        return new DiagnosticoResponse("OK",
                 ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                List.of(new DiagnosticoFtthDto(
+                List.of(new DiagnosticoDto(
                         cuenta,
                         codigo,
                         descripcion

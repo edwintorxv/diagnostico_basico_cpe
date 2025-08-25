@@ -2,11 +2,22 @@ package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.repository.adapter
 
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteRequest;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseArpDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseArpPollerDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseCmDataDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseCmDataPollerDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseGetWifiData;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseWifiDataClient;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
@@ -17,9 +28,17 @@ public class PollerAdapter implements IPollerPortOut {
 
     @Value("${poller.service.url}")
     private String pollerServiceUrl;
-
-
-
+    
+    @Value("${poller.service.arp.url}")
+    private String pollerServiceArpUrl;
+    
+    @Value("${poller.service.getestadocm.url}")
+    private String pollerServiceGetACM;
+   
+    @Value("${poller.service.getconsultabanda.url}")
+    private String pollerServiceConsultaBanda;
+    
+    
     @Override
     public InventarioPorClienteResponse obtenerInventarioPorCliente(InventarioPorClienteRequest request) throws Exception {
 
@@ -45,4 +64,62 @@ public class PollerAdapter implements IPollerPortOut {
 
         }
     }
+    
+    @Override
+    public List<ResponseArpPollerDto> consultarARP(String mac) { 
+        String finalUrl = pollerServiceArpUrl + mac;
+
+        try {
+  
+        	ResponseArpDto apiResponse = restTemplate.getForObject(finalUrl, ResponseArpDto.class);
+            
+            if (apiResponse != null && apiResponse.getData() != null) {
+                return apiResponse.getData();
+            } else {
+                return Collections.emptyList();
+            }
+
+        } catch (RestClientException e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller consultarARP para la MAC: " + mac, e);
+        }
+    }
+
+	@Override
+	public List<ResponseCmDataPollerDto> consultarCMData(String mac) throws Exception {
+		String finalUrl = pollerServiceGetACM + mac;
+
+        try {
+  
+        	ResponseCmDataDto apiResponse = restTemplate.getForObject(finalUrl, ResponseCmDataDto.class);
+            
+            if (apiResponse != null && apiResponse.getData() != null) {
+                return apiResponse.getData();
+            } else {
+                return Collections.emptyList();
+            }
+
+        } catch (RestClientException e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller consultarCMData para la MAC: " + mac, e);
+        }
+	}
+
+	@Override
+	public List<ResponseGetWifiData> consultarCMBandas(String mac) throws Exception {
+	    String finalUrl = pollerServiceConsultaBanda + mac;
+
+	    try {
+	     
+	        ResponseWifiDataClient apiResponse = restTemplate.getForObject(finalUrl, ResponseWifiDataClient.class);
+	        
+	        if (apiResponse != null && apiResponse.getData() != null) {
+	            // Devuelves la lista interna, que ahora coincide con la firma del método.
+	            return apiResponse.getData();
+	        } else {
+	            return Collections.emptyList();
+	        }
+
+	    } catch (RestClientException e) {
+	        throw new RuntimeException("Error al consumir el servicio de Poller consultarCMBandas para la MAC: " + mac, e);
+	    }
+	}
 }
