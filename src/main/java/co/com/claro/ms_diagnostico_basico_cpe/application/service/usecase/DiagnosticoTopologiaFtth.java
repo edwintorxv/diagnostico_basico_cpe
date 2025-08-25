@@ -1,24 +1,24 @@
 package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase;
 
-import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.DiagnosticoTopologiaFtthStrategy;
-import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaFtthConMeshStrategy;
-import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaFtthSinMeshStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteRequest;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.ITopologiaFtthConMeshStrategyPortIn;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.ITopologiaFtthSinMeshStrategyPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.diagnostico.IDiagnosticoFTTHPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
+@Primary
 @Service
 @RequiredArgsConstructor
 public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
@@ -26,8 +26,8 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
     private final IAcsPortOut acsPortOut;
     private final IPollerPortOut pollerPortOut;
 
-    private final TopologiaFtthSinMeshStrategy ftthSinMeshsStrategy;
-    private final TopologiaFtthConMeshStrategy ftthConMeshsStrategy;
+    private final ITopologiaFtthSinMeshStrategyPortIn ftthSinMeshsStrategy;
+    private final ITopologiaFtthConMeshStrategyPortIn ftthConMeshsStrategy;
     //private final InventarioPorTopoligiaDto inventarioPoller;
     private final InventarioPoller inventarioPoller;
 
@@ -50,11 +50,10 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
             );
         }
 
-        DiagnosticoTopologiaFtthStrategy strategy =
-                (inventarioTopologiaFtth.getLstinventarioMesh() == null || inventarioTopologiaFtth.getLstinventarioMesh().isEmpty())
-                        ? ftthSinMeshsStrategy
-                        : ftthConMeshsStrategy;
-
-        return strategy.diagnosticar(inventarioTopologiaFtth, acsPortOut);
+        if (inventarioTopologiaFtth.getLstinventarioMesh() == null || inventarioTopologiaFtth.getLstinventarioMesh().isEmpty()) {
+            return ftthSinMeshsStrategy.diagnosticar(inventarioTopologiaFtth);
+        } else {
+            return ftthConMeshsStrategy.diagnosticar(inventarioTopologiaFtth);
+        }
     }
 }

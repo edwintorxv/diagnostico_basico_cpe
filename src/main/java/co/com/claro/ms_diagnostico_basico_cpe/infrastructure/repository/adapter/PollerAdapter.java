@@ -41,7 +41,7 @@ public class PollerAdapter implements IPollerPortOut {
             return response.getBody();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+            throw new RuntimeException("Error al consumir el servicio de Poller: " + e.getMessage());
 
         }
     }

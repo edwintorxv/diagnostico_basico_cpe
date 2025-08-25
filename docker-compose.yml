@@ -1,0 +1,21 @@
+services:
+  ms-diagnostico-basico-cpe:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ms-diagnostico-basico-cpe:latest
+    container_name: ms-diagnostico-basico-cpe
+    # Si no es obligatorio correr con un UID específico, mejor comentarlo
+    # user: "1005:1005"
+    ports:
+      - "9100:9100"
+    environment:
+      - TZ=America/Bogota
+      - JAVA_OPTS=-Duser.timezone=America/Bogota
+    volumes:
+      # Carpeta de logs completa
+      - ./logs:/var/log/ms-diagnostico-basico-cpe
+      # Montar solo el archivo de propiedades directamente
+      - ./properties/ms-diagnostico-basico-cpe.properties:/var/properties/ms-diagnostico-basico-cpe.properties:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

@@ -244,6 +244,7 @@
 
 	<!-- Configuración del proceso de compilación, empaquetado y plugins de Maven -->
 	<build>
+		<finalName>ms-diagnostico-basico-cpe</finalName>
 		<plugins>
 			<!-- Plugin de Spring Boot que permite empaquetar la aplicación como un archivo ejecutable (fat jar) -->
 			<plugin>

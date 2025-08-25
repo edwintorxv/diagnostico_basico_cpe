@@ -10,27 +10,30 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.Diagn
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.ITopologiaFtthSinMeshStrategyPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
+@Primary
 @Service
-public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStrategy {
+@RequiredArgsConstructor
+public class TopologiaFtthSinMeshStrategy implements ITopologiaFtthSinMeshStrategyPortIn {
 
     private final ConsultarParametrosDipositivosService consultarParametrosDipositivosService;
     private final CanalWifiValidator canalWifiValidator;
+    private final IAcsPortOut acsPortOut;
 
-    public TopologiaFtthSinMeshStrategy(CanalWifiValidator canalWifiValidator,
-                                        ConsultarParametrosDipositivosService consultarParametrosDipositivosService) {
-        this.consultarParametrosDipositivosService = consultarParametrosDipositivosService;
-        this.canalWifiValidator = canalWifiValidator;
-    }
 
     @Override
-    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto inventario, IAcsPortOut acsPortOut) {
+    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto inventario) throws Exception {
         String cuentaCliente = inventario.getCuentaCliente();
         try {
 

@@ -1,10 +1,12 @@
 package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.utils.configuration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
@@ -14,8 +16,14 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.time.Instant;
+import java.text.DateFormat;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
@@ -42,7 +50,7 @@ import java.util.*;
  * - Hibérnate: Para soporte de proxies en serialización.
  * - SLF4J: Para el registro de logs.
  *
- * @autor <a href="mailto:betancourtks@globalhitss.com">Sebastian Betancourt</a> on 11/07/2024
+ * @autor <a href="mailto:betancourtks@hitss.com">Sebastian Betancourt</a> on 11/07/2024
  */
 @Slf4j // Proporciona un logger para registrar mensajes en esta clase.
 public class UtilJson {
@@ -64,6 +72,230 @@ public class UtilJson {
             return in != null && in.peek() != null ? Instant.parse(in.nextString()) : null;
         }
     };
+
+    private static final TypeAdapter<LocalDate> localDateTypeAdapter = new TypeAdapter<LocalDate>() {
+        @Override
+        public void write(JsonWriter out, LocalDate value) throws IOException {
+            if (value == null) {
+                out.nullValue();
+                return;
+            }
+            out.value(value.toString()); // "yyyy-MM-dd"
+        }
+
+        @Override
+        public LocalDate read(JsonReader in) throws IOException {
+            JsonToken token = in.peek();
+            if (token == JsonToken.NULL) {
+                in.nextNull();   // consumir el NULL del reader
+                return null;
+            }
+            String s = in.nextString();
+            if (s == null || s.isBlank()) {
+                return null;
+            }
+            return LocalDate.parse(s);   // ISO-8601
+        }
+    };
+
+
+    private static final TypeAdapter<LocalDateTime> localDateTimeTypeAdapter = new TypeAdapter<LocalDateTime>() {
+        @Override
+        public void write(JsonWriter out, LocalDateTime v) throws IOException {
+            if (v == null) {
+                out.nullValue();
+                return;
+            }
+            out.value(DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(v)); // "yyyy-MM-dd'T'HH:mm:ss"
+        }
+
+        @Override
+        public LocalDateTime read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
+            String s = in.nextString();
+            return (s == null || s.isBlank()) ? null : LocalDateTime.parse(s, DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        }
+    };
+
+    private static final TypeAdapter<OffsetDateTime> offsetDateTimeTypeAdapter = new TypeAdapter<OffsetDateTime>() {
+        @Override
+        public void write(JsonWriter out, OffsetDateTime v) throws IOException {
+            if (v == null) {
+                out.nullValue();
+                return;
+            }
+            out.value(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(v));
+        }
+
+        @Override
+        public OffsetDateTime read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
+            String s = in.nextString();
+            return (s == null || s.isBlank()) ? null : OffsetDateTime.parse(s, DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        }
+    };
+
+    private static final TypeAdapter<ZonedDateTime> zonedDateTimeTypeAdapter = new TypeAdapter<ZonedDateTime>() {
+        @Override
+        public void write(JsonWriter out, ZonedDateTime v) throws IOException {
+            if (v == null) {
+                out.nullValue();
+                return;
+            }
+            out.value(DateTimeFormatter.ISO_ZONED_DATE_TIME.format(v));
+        }
+
+        @Override
+        public ZonedDateTime read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
+            String s = in.nextString();
+            return (s == null || s.isBlank()) ? null : ZonedDateTime.parse(s, DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        }
+    };
+
+    /**
+     * Serializa TimeZone como su ID (e.g., "America/Bogota").
+     */
+    private static final TypeAdapter<TimeZone> TIMEZONE_ADAPTER = new TypeAdapter<TimeZone>() {
+        @Override
+        public void write(JsonWriter out, TimeZone tz) throws IOException {
+            if (tz == null) {
+                out.nullValue();
+                return;
+            }
+            out.value(tz.getID());
+        }
+
+        @Override
+        public TimeZone read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
+            String id = in.nextString();
+            // getTimeZone nunca lanza, devuelve "GMT" si es inválido
+            TimeZone tz = TimeZone.getTimeZone(id);
+            // Validación opcional: si no existe, rechaza
+            if (!tz.getID().equals(id) && !id.toUpperCase().startsWith("GMT")) {
+                throw new IOException("TimeZone inválida: " + id);
+            }
+            return tz;
+        }
+    };
+
+    /**
+     * Serializa Calendar como { "time": epochMillis, "zone": "ID" }.
+     */
+    private static final TypeAdapter<Calendar> CALENDAR_ADAPTER = new TypeAdapter<Calendar>() {
+        @Override
+        public void write(JsonWriter out, Calendar cal) throws IOException {
+            if (cal == null) {
+                out.nullValue();
+                return;
+            }
+            out.beginObject();
+            out.name("time").value(cal.getTimeInMillis());
+            out.name("zone").value(cal.getTimeZone().getID());
+            out.endObject();
+        }
+
+        @Override
+        public Calendar read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) {
+                in.nextNull();
+                return null;
+            }
+            long time = 0L;
+            String zone = "UTC";
+            in.beginObject();
+            while (in.hasNext()) {
+                String name = in.nextName();
+                if ("time".equals(name)) time = in.nextLong();
+                else if ("zone".equals(name)) zone = in.nextString();
+                else in.skipValue();
+            }
+            in.endObject();
+            TimeZone tz = TimeZone.getTimeZone(zone);
+            Calendar cal = new GregorianCalendar(tz);
+            cal.setLenient(false);
+            cal.setTimeInMillis(time);
+            return cal;
+        }
+    };
+    private static final TypeAdapter<DateFormat> DATEFORMAT_ADAPTER = new TypeAdapter<>() {
+        @Override public void write(JsonWriter out, DateFormat df) throws IOException {
+            if (df == null) { out.nullValue(); return; }
+            if (df instanceof java.text.SimpleDateFormat sdf) out.value(sdf.toPattern());
+            else out.value(df.toString());
+        }
+        @Override public DateFormat read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) { in.nextNull(); return null; }
+            String p = in.nextString();
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(p, java.util.Locale.US);
+            sdf.setTimeZone(java.util.TimeZone.getTimeZone("America/Bogota"));
+            sdf.setLenient(false);
+            return sdf;
+        }
+    };
+
+    private static final TypeAdapter<AtomicBoolean> ATOMIC_BOOLEAN_ADAPTER = new TypeAdapter<>() {
+        @Override public void write(JsonWriter out, AtomicBoolean v) throws IOException {
+            if (v == null) { out.nullValue(); return; }
+            out.value(v.get());
+        }
+        @Override public AtomicBoolean read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) { in.nextNull(); return null; }
+            return new AtomicBoolean(in.nextBoolean());
+        }
+    };
+
+    private static final TypeAdapter<AtomicInteger> ATOMIC_INTEGER_ADAPTER = new TypeAdapter<>() {
+        @Override public void write(JsonWriter out, AtomicInteger v) throws IOException {
+            if (v == null) { out.nullValue(); return; }
+            out.value(v.get());
+        }
+        @Override public AtomicInteger read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) { in.nextNull(); return null; }
+            return new AtomicInteger(in.nextInt());
+        }
+    };
+
+    private static final TypeAdapter<AtomicLong> ATOMIC_LONG_ADAPTER = new TypeAdapter<>() {
+        @Override public void write(JsonWriter out, AtomicLong v) throws IOException {
+            if (v == null) { out.nullValue(); return; }
+            out.value(v.get());
+        }
+        @Override public AtomicLong read(JsonReader in) throws IOException {
+            if (in.peek() == JsonToken.NULL) { in.nextNull(); return null; }
+            return new AtomicLong(in.nextLong());
+        }
+    };
+
+    private static final TypeAdapter<AtomicReference<?>> atomicReferenceAdapter =
+            new TypeAdapter<>() {
+                @Override
+                public void write(JsonWriter out, AtomicReference<?> value) throws IOException {
+                    if (value == null || value.get() == null) {
+                        out.nullValue();
+                    } else {
+                        out.jsonValue(gson.toJson(value.get())); // serializar el contenido
+                    }
+                }
+
+                @Override
+                public AtomicReference<?> read(JsonReader in) throws IOException {
+                    throw new UnsupportedOperationException("Deserialization of AtomicReference is not supported.");
+                }
+            };
 
     // Adaptador para manejar la serialización de objetos proxy de Hibernate.
     private static final TypeAdapter<Object> hibernateProxyAdapter = new TypeAdapter<>() {
@@ -155,10 +387,21 @@ public class UtilJson {
     // Configuración de Gson con los adaptadores personalizados y opciones generales.
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, instantTypeAdapter) // Registro del adaptador de Instant.
+            .registerTypeAdapter(LocalDate.class, localDateTypeAdapter)
+            .registerTypeAdapter(LocalDateTime.class, localDateTimeTypeAdapter)
+            .registerTypeAdapter(OffsetDateTime.class, offsetDateTimeTypeAdapter)
+            .registerTypeAdapter(ZonedDateTime.class, zonedDateTimeTypeAdapter)
+            .registerTypeHierarchyAdapter(DateFormat.class, DATEFORMAT_ADAPTER)
+            .registerTypeHierarchyAdapter(TimeZone.class,   TIMEZONE_ADAPTER)
+            .registerTypeHierarchyAdapter(Calendar.class,   CALENDAR_ADAPTER)
+            .registerTypeAdapter(AtomicBoolean.class, ATOMIC_BOOLEAN_ADAPTER)
+            .registerTypeAdapter(AtomicInteger.class, ATOMIC_INTEGER_ADAPTER)
+            .registerTypeAdapter(AtomicLong.class,    ATOMIC_LONG_ADAPTER)
             .registerTypeHierarchyAdapter(HibernateProxy.class, hibernateProxyAdapter) // Registro del adaptador de HibernateProxy.
             .registerTypeAdapter(Optional.class, optionalTypeAdapter) // Registro del adaptador de Optional.
             .registerTypeAdapter(Charset.class, charsetTypeAdapter) // Registro del adaptador de Charset.
             .registerTypeAdapter(Throwable.class, throwableTypeAdapter) // Registro del adaptador de Throwable.
+            .registerTypeHierarchyAdapter(AtomicReference.class, atomicReferenceAdapter)
             .serializeNulls() // Permite incluir valores nulos en la serialización.
             .setFieldNamingPolicy(FieldNamingPolicy.IDENTITY) // Mantiene los nombres originales de los campos.
             .disableHtmlEscaping() // Desactiva el escape automático de caracteres Unicode.
@@ -629,6 +872,34 @@ public class UtilJson {
         try {
             // Deserializa el JSON del cuerpo de la respuesta al tipo especificado.
             return objectMapper.readValue(responseEntity.getBody(), dtoClass);
+        } catch (Exception e) {
+            log.error("Error al mapear el JSON al DTO: {}", e.getMessage(), e);
+            throw new IOException("No se pudo mapear el JSON al DTO especificado.", e);
+        }
+    }
+
+    /**
+     * Valida que el String de entrada sea un JSON válido y lo mapea a un DTO.
+     *
+     * @param json     El String que debe contener un JSON bien formado.
+     * @param dtoClass La clase del DTO al que se desea mapear.
+     * @param <T>      El tipo genérico del DTO.
+     * @return Una instancia del DTO mapeado.
+     * @throws IOException Si ocurre un error al deserializar el JSON.
+     */
+    public static <T> T mapResponseToDto(String json, Class<T> dtoClass) throws IOException {
+        if (json == null || json.trim().isEmpty()) {
+            throw new IllegalArgumentException("El JSON de entrada no puede ser nulo ni vacío.");
+        }
+
+        try {
+            // Primero validamos que sea JSON bien formado
+            JsonNode node = objectMapper.readTree(json);
+            // Si llega aquí, 'node' es un JsonNode válido; hacemos el mapeo al DTO
+            return objectMapper.treeToValue(node, dtoClass);
+        } catch (JsonProcessingException e) {
+            log.error("El string proporcionado no es un JSON válido: {}", e.getMessage(), e);
+            throw new IllegalArgumentException("El string proporcionado no es un JSON válido.", e);
         } catch (Exception e) {
             log.error("Error al mapear el JSON al DTO: {}", e.getMessage(), e);
             throw new IOException("No se pudo mapear el JSON al DTO especificado.", e);

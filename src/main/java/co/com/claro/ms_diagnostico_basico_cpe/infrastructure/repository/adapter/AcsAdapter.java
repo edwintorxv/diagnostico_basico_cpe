@@ -33,15 +33,18 @@ public class AcsAdapter implements IAcsPortOut {
         try {
             String url = acsServiceDeviceStatus + "?serial=" + serial;
 
+            System.out.println("URL generada para ACS: " + url);
+
             ResponseEntity<DeviceStatusResponse> response =
                     restTemplate.getForEntity(url, DeviceStatusResponse.class);
 
             return response.getBody();
 
+        } catch (HttpStatusCodeException e) {
+            throw new Exception("Error HTTP en consulta StatusDevice a ACS: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e);
         } catch (Exception e) {
-
+            throw new Exception("Error inesperado en consulta StatusDevice ACS: " + e.getMessage(), e);
         }
-        return null;
     }
 
     @Override
@@ -66,10 +69,10 @@ public class AcsAdapter implements IAcsPortOut {
             return body;
 
         } catch (HttpStatusCodeException ex) {
-            throw new Exception("Error HTTP en consulta a ACS", ex);
+            throw new Exception("Error HTTP en consulta a ACS: " + ex.getMessage());
 
         } catch (Exception ex) {
-            throw new Exception("Error inesperado al consultar ACS", ex);
+            throw new Exception("Error inesperado al consultar ACS: " + ex.getMessage());
         }
     }
 }

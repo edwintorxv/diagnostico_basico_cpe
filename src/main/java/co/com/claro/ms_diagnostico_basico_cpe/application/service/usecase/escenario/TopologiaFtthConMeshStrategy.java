@@ -11,9 +11,13 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.Diagn
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.ITopologiaFtthConMeshStrategyPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,24 +25,19 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
+@Primary
 @Service
-public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStrategy {
+@RequiredArgsConstructor
+public class TopologiaFtthConMeshStrategy  implements ITopologiaFtthConMeshStrategyPortIn {
 
     private final ConsultarParametrosDipositivosService consultarParametrosDipositivosService;
     private final MacAdreesValidator macAdreesValidator;
     private final CanalWifiValidator canalWifiValidator;
-
-    public TopologiaFtthConMeshStrategy(CanalWifiValidator canalWifiValidator,
-                                        ConsultarParametrosDipositivosService consultarParametrosDipositivosService,
-                                        MacAdreesValidator macAdreesValidator) {
-        this.canalWifiValidator = canalWifiValidator;
-        this.consultarParametrosDipositivosService = consultarParametrosDipositivosService;
-        this.macAdreesValidator = macAdreesValidator;
-    }
+    private final IAcsPortOut acsPortOut;
 
     @Override
-    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto topologia,
-                                                IAcsPortOut acsPortOut) {
+    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto topologia) {
 
         final String cuentaCliente = topologia.getCuentaCliente();
 
