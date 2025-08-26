@@ -3,6 +3,7 @@
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
+
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -17,6 +18,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>ms_diagnostico_basico_cpe</name>
 	<description>ms_diagnostico_basico_cpe</description>
+
 
 	<properties>
 		<!-- Define la versión de Java que se usará en la compilación -->
@@ -244,6 +246,7 @@
 
 	<!-- Configuración del proceso de compilación, empaquetado y plugins de Maven -->
 	<build>
+		<finalName>ms-diagnostico-basico-cpe</finalName>
 		<plugins>
 			<!-- Plugin de Spring Boot que permite empaquetar la aplicación como un archivo ejecutable (fat jar) -->
 			<plugin>

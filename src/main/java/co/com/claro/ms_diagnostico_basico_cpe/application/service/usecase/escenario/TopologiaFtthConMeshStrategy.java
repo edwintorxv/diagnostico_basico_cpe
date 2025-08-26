@@ -76,15 +76,15 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             DeviceStatusResponse deviceStatus = acsPortOut.obtenerEstadoPorSerial(cpePrincipal.getSerialNumber());
             if (deviceStatus == null || deviceStatus.getData() == null || deviceStatus.getData().isEmpty()) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_NO_ONLINE_CODIGO,
-                        Constantes.ONT_NO_ONLINE_DESCRIPCION);
+                        Constantes.FTTH_NO_ONLINE_CODIGO,
+                        Constantes.FTTH_NO_ONLINE_DESCRIPCION);
             }
 
             DeviceStatusDto statusDto = deviceStatus.getData().get(0);
             if (statusDto == null || "false".equalsIgnoreCase(statusDto.getOnline())) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_NO_ONLINE_CODIGO,
-                        Constantes.ONT_NO_ONLINE_DESCRIPCION);
+                        Constantes.FTTH_NO_ONLINE_CODIGO,
+                        Constantes.FTTH_NO_ONLINE_DESCRIPCION);
             }
 
             // 2) Parámetros ONT
@@ -105,8 +105,8 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             long conteoCoincidenciasOnt = macsOnt.stream().filter(seriales::contains).count();
             if (conteoCoincidenciasOnt > 1) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION);
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO,
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION);
             }
 
             // 4) Buscar AP maestro en inventario
@@ -121,8 +121,8 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             // Validar estado AP maestro
             if (!HelperMesh.estaOnline(HelperMesh.serialPreferido(meshMaster), acsPortOut)) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION);
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO,
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION);
             }
 
             // 5) Consultar parámetros AP maestro
@@ -148,8 +148,8 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
 
             if (macsMesh.stream().filter(seriales::contains).count() == 0) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION);
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO,
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION);
             }
 
             // 6) Buscar AP esclavo
@@ -178,18 +178,18 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             // 7) Diagnósticos finales de canales
             if (!wifiSlaveOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION);
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION);
             }
             if (wifiOntOk && wifiSlaveOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION);
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO,
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION);
             }
             if (!wifiOntOk && wifiSlaveOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION);
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO,
+                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION);
             }
 
             return HelperMesh.errorInventario(cuentaCliente);
