@@ -1,6 +1,5 @@
 package co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,9 +7,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiagnosticoFtthDto {
+public class DiagnosticoHfcDto {
+	
+	 private String account;
+	 private String code;
+	 private String description;
 
-    private String account;
-    private String code;
-    private String description;
 }

@@ -10,11 +10,11 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiagnosticoFtthResponse extends GenericResponseDto {
+public class DiagnosticoResponse extends GenericResponseDto {
 
-    private List<DiagnosticoFtthDto> data;
+    private List<DiagnosticoDto> data;
 
-    public DiagnosticoFtthResponse(String status, String message, List<DiagnosticoFtthDto> data) {
+    public DiagnosticoResponse(String status, String message, List<DiagnosticoDto> data) {
         super(status, message); // Llama al constructor de GenericResponseDto
         this.data = data;
     }
