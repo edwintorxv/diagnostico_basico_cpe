@@ -55,8 +55,8 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
 
             if ("false".equalsIgnoreCase(statusDto.getOnline())) {
                 return diagnostico(cuentaCliente,
-                        Constantes.ONT_NO_ONLINE_CODIGO,
-                        Constantes.ONT_NO_ONLINE_DESCRIPCION);
+                        Constantes.FTTH_NO_ONLINE_CODIGO,
+                        Constantes.FTTH_NO_ONLINE_DESCRIPCION);
             }
 
             if (deviceStatus == null) {
@@ -99,8 +99,8 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
                         ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                         List.of(new DiagnosticoDto(
                                 cuentaCliente,
-                                Constantes.ONT_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_CODIGO,
-                                Constantes.ONT_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_DESCRIPCION
+                                Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_CODIGO,
+                                Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_DESCRIPCION
                         ))
                 );
             } else {
@@ -110,8 +110,8 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
                         ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                         List.of(new DiagnosticoDto(
                                 cuentaCliente,
-                                Constantes.ONT_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
-                                Constantes.ONT_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION
+                                Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
+                                Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION
                         ))
                 );
             }
