@@ -6,6 +6,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
 import org.springframework.stereotype.Service;
 
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.ConsultarParametrosDipositivosService;
@@ -27,160 +29,177 @@ import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configura
 @Service
 public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrategy {
 
-	private final ConsultarParametrosDipositivosService consultarParametrosDipositivosService;
-	private final MacAdreesValidator macAdreesValidator;
-	private final CanalWifiValidator canalWifiValidator;
+    private final ConsultarParametrosDipositivosService consultarParametrosDipositivosService;
+    private final MacAdreesValidator macAdreesValidator;
+    private final CanalWifiValidator canalWifiValidator;
 
-	public TopologiaHfcConMeshStrategy(CanalWifiValidator canalWifiValidator,
-			ConsultarParametrosDipositivosService consultarParametrosDipositivosService,
-			MacAdreesValidator macAdreesValidator) {
-		this.canalWifiValidator = canalWifiValidator;
-		this.consultarParametrosDipositivosService = consultarParametrosDipositivosService;
-		this.macAdreesValidator = macAdreesValidator;
-	}
+    public TopologiaHfcConMeshStrategy(CanalWifiValidator canalWifiValidator,
+                                       ConsultarParametrosDipositivosService consultarParametrosDipositivosService,
+                                       MacAdreesValidator macAdreesValidator) {
+        this.canalWifiValidator = canalWifiValidator;
+        this.consultarParametrosDipositivosService = consultarParametrosDipositivosService;
+        this.macAdreesValidator = macAdreesValidator;
+    }
 
-	@Override
-	public DiagnosticoResponse diagnosticar(InventarioPorTopoligiaDto topologia, IPollerPortOut pollerPortOut,
-			IAcsPortOut acsPortOut) throws Exception {
+    @Override
+    public DiagnosticoResponse diagnosticar(InventarioPorTopoligiaDto topologia, IPollerPortOut pollerPortOut,
+                                            IAcsPortOut acsPortOut) throws Exception {
 
-		String cuentaCliente = topologia.getCuentaCliente();
-		try {
-			InventarioPorClienteDto cpePrincipal = topologia.getInventarioCPE();
-			List<InventarioPorClienteDto> meshList = Optional.ofNullable(topologia.getLstinventarioMesh())
-					.orElseGet(List::of);
+        String cuentaCliente = topologia.getCuentaCliente();
+        Transaction transaction = Transaction.startTransaction();
 
-			if (cpePrincipal == null) {
-				return HelperMesh.errorInventario(cuentaCliente);
-			}
+        try {
+            InventarioPorClienteDto cpePrincipal = topologia.getInventarioCPE();
+            List<InventarioPorClienteDto> meshList = Optional.ofNullable(topologia.getLstinventarioMesh())
+                    .orElseGet(List::of);
 
-			List<InventarioPorClienteDto> equipos = new ArrayList<>();
-			equipos.add(cpePrincipal);
-			equipos.addAll(meshList);
+            if (cpePrincipal == null) {
+                return HelperMesh.errorInventario(cuentaCliente, transaction);
+            }
 
-			List<String> seriales = equipos.stream().map(HelperMesh::serialInventarioNormalizado) // toma serialNumber o
-																									// serialMac
-					.filter(Objects::nonNull).toList();
+            List<InventarioPorClienteDto> equipos = new ArrayList<>();
+            equipos.add(cpePrincipal);
+            equipos.addAll(meshList);
 
-			List<ResponseArpPollerDto> listaArp = pollerPortOut
-					.consultarARP(HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac()));
+            List<String> seriales = equipos.stream().map(HelperMesh::serialInventarioNormalizado) // toma serialNumber o
+                    // serialMac
+                    .filter(Objects::nonNull).toList();
 
-			if (listaArp == null || listaArp.isEmpty()) {
-				return HelperMesh.diagnostico(cuentaCliente,
-						Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO,
-						Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION);
-			}
+            List<ResponseArpPollerDto> listaArp = pollerPortOut
+                    .consultarARP(HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac()));
 
-			List<ResponseArpPollerDto> coincidencias = listaArp.stream().filter(arpItem -> {
-				boolean estadoActivo = "Activo".equalsIgnoreCase(arpItem.getStatus());
-				String macArpSinFormato = arpItem.getMac().replace(":", "").toUpperCase();
-				boolean macCoincide = seriales.contains(macArpSinFormato);
-				return estadoActivo && macCoincide;
-			}).collect(Collectors.toList());
+            if (listaArp == null || listaArp.isEmpty()) {
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION, transaction));
+            }
 
-			long numeroDeCoincidencias = coincidencias.size();
+            List<ResponseArpPollerDto> coincidencias = listaArp.stream().filter(arpItem -> {
+                boolean estadoActivo = "Activo".equalsIgnoreCase(arpItem.getStatus());
+                String macArpSinFormato = arpItem.getMac().replace(":", "").toUpperCase();
+                boolean macCoincide = seriales.contains(macArpSinFormato);
+                return estadoActivo && macCoincide;
+            }).collect(Collectors.toList());
 
-			if (numeroDeCoincidencias == 1) {
+            long numeroDeCoincidencias = coincidencias.size();
 
-				ResponseArpPollerDto apMaestroEncontrado = coincidencias.get(0);
-				String macMaster = apMaestroEncontrado.getMac();
+            if (numeroDeCoincidencias == 1) {
 
-				String macSinPuntos = HelperMesh.unformatMacAddress(macMaster);
+                ResponseArpPollerDto apMaestroEncontrado = coincidencias.get(0);
+                String macMaster = apMaestroEncontrado.getMac();
 
-				// 5) Consultar parámetros AP maestro
-				Optional<InventarioPorClienteDto> maestroEncontradoInv = topologia.getLstinventarioMesh().stream()
-						.filter(equipo -> equipo.getSerialNumber() != null
-								&& equipo.getSerialNumber().equals(macSinPuntos.toUpperCase()))
-						.findFirst();
+                String macSinPuntos = HelperMesh.unformatMacAddress(macMaster);
 
-				boolean wifiMaestro = false;
+                // 5) Consultar parámetros AP maestro
+                Optional<InventarioPorClienteDto> maestroEncontradoInv = topologia.getLstinventarioMesh().stream()
+                        .filter(equipo -> equipo.getSerialNumber() != null
+                                && equipo.getSerialNumber().equals(macSinPuntos.toUpperCase()))
+                        .findFirst();
 
-				if (maestroEncontradoInv.isPresent()) {
+                boolean wifiMaestro = false;
 
-					InventarioPorClienteDto meshMaster = maestroEncontradoInv.get();
+                if (maestroEncontradoInv.isPresent()) {
 
-					// Validar estado AP maestro en ACS
-					if (!HelperMesh.estaOnline(meshMaster.getSerialMac(), acsPortOut)) {
-						return HelperMesh.diagnostico(cuentaCliente,
-								Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO,
-								Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION);
-					}
+                    InventarioPorClienteDto meshMaster = maestroEncontradoInv.get();
 
-					// 5) Consultar parámetros AP maestro
-					DeviceParamsDto dtoMesh = HelperMesh.buildDeviceParamsDto(HelperMesh.serialPreferido(meshMaster),
-							Constantes.KEY_OR_TREE_MESH, HelperMesh.safeLower(meshMaster.getMarca()),
-							meshMaster.getModelo());
+                    // Validar estado AP maestro en ACS
+                    if (!HelperMesh.estaOnline(meshMaster.getSerialMac(), acsPortOut)) {
+                        return HelperMesh.diagnostico(cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION, transaction));
+                    }
 
-					DeviceParamsResponse responseMesh = consultarParametrosDipositivosService
-							.consultarParametrosDispositivo(dtoMesh);
+                    // 5) Consultar parámetros AP maestro
+                    DeviceParamsDto dtoMesh = HelperMesh.buildDeviceParamsDto(HelperMesh.serialPreferido(meshMaster),
+                            Constantes.KEY_OR_TREE_MESH, HelperMesh.safeLower(meshMaster.getMarca()),
+                            meshMaster.getModelo());
 
-					if (HelperMesh.isAcsDataEmpty(responseMesh)) {
-						return HelperMesh.diagnostico(cuentaCliente, Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-								Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
-					} else {
-						wifiMaestro = true;
-					}
+                    DeviceParamsResponse responseMesh = consultarParametrosDipositivosService
+                            .consultarParametrosDispositivo(dtoMesh);
 
-					List<String> macsMesh = HelperMesh.normalizarListaMac(
-							macAdreesValidator.macAddressDetectadas(responseMesh, dtoMesh.getKeyOrTree()));
+                    if (HelperMesh.isAcsDataEmpty(responseMesh)) {
+                        return HelperMesh.diagnostico(cuentaCliente, Constantes.ACS_NO_REPORTA_DATA_CODIGO,
+                                Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
+                    } else {
+                        wifiMaestro = true;
+                    }
 
-					// 6) Buscar AP esclavo
-					InventarioPorClienteDto meshSlave = HelperMesh.findInventarioCoincidente(equipos, macsMesh);
-					if (meshSlave == null) {
-						return HelperMesh.errorInventario(cuentaCliente);
-					}
+                    List<String> macsMesh = HelperMesh.normalizarListaMac(
+                            macAdreesValidator.macAddressDetectadas(responseMesh, dtoMesh.getKeyOrTree()));
 
-					// Consultar AP esclavo
-					DeviceParamsDto dtoSlave = HelperMesh.buildDeviceParamsDto(HelperMesh.serialPreferido(meshSlave),
-							Constantes.KEY_OR_TREE_MESH, meshMaster.getMarca(), meshMaster.getModelo());
+                    // 6) Buscar AP esclavo
+                    InventarioPorClienteDto meshSlave = HelperMesh.findInventarioCoincidente(equipos, macsMesh);
+                    if (meshSlave == null) {
+                        return HelperMesh.errorInventario(cuentaCliente, transaction);
+                    }
 
-					DeviceParamsResponse responseSlave = consultarParametrosDipositivosService
-							.consultarParametrosDispositivo(dtoSlave);
-					if (HelperMesh.isAcsDataEmpty(responseSlave)) {
-						return HelperMesh.diagnostico(cuentaCliente, Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-								Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
-					}
+                    // Consultar AP esclavo
+                    DeviceParamsDto dtoSlave = HelperMesh.buildDeviceParamsDto(HelperMesh.serialPreferido(meshSlave),
+                            Constantes.KEY_OR_TREE_MESH, meshMaster.getMarca(), meshMaster.getModelo());
 
-					boolean wifiSlaveOk = canalWifiValidator.validar(responseSlave, dtoSlave.getKeyOrTree());
+                    DeviceParamsResponse responseSlave = consultarParametrosDipositivosService
+                            .consultarParametrosDispositivo(dtoSlave);
+                    if (HelperMesh.isAcsDataEmpty(responseSlave)) {
+                        return HelperMesh.diagnostico(cuentaCliente, Constantes.ACS_NO_REPORTA_DATA_CODIGO,
+                                Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
+                    }
 
-					// 7) Diagnósticos finales de canales
-					if (!wifiSlaveOk) {
-						return HelperMesh.diagnostico(cuentaCliente,
-								Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
-								Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION);
-					}
+                    boolean wifiSlaveOk = canalWifiValidator.validar(responseSlave, dtoSlave.getKeyOrTree());
 
-					if (wifiMaestro && wifiSlaveOk) {
-						return HelperMesh.diagnostico(cuentaCliente,
-								Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO,
-								Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION);
-					}
-					if (!wifiMaestro && wifiSlaveOk) {
-						return HelperMesh.diagnostico(cuentaCliente,
-								Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO,
-								Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION);
-					}
+                    // 7) Diagnósticos finales de canales
+                    if (!wifiSlaveOk) {
+                        return HelperMesh.diagnostico(cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION, transaction));
+                    }
 
-				}
+                    if (wifiMaestro && wifiSlaveOk) {
+                        return HelperMesh.diagnostico(cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION, transaction));
+                    }
+                    if (!wifiMaestro && wifiSlaveOk) {
+                        return HelperMesh.diagnostico(cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION, transaction));
+                    }
 
-			} else if (numeroDeCoincidencias > 1) {
-				return HelperMesh.diagnostico(cuentaCliente, Constantes.HFC_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO,
-						Constantes.HFC_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION);
+                }
 
-			} else if (numeroDeCoincidencias == 0) {
-				return HelperMesh.diagnostico(cuentaCliente,
-						Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO,
-						Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION);
-			}
+            } else if (numeroDeCoincidencias > 1) {
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION, transaction));
 
-			return HelperMesh.errorInventario(cuentaCliente);
+            } else if (numeroDeCoincidencias == 0) {
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION, transaction));
+            }
 
-		} catch (Exception e) {
-			return new DiagnosticoResponse("OK", ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-					List.of(new DiagnosticoDto(cuentaCliente, Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
-							String.format(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, cuentaCliente))));
+            return HelperMesh.errorInventario(cuentaCliente, transaction);
 
-		}
+        } catch (Exception e) {
+            String codigo;
+            String descripcion;
+            try {
+                codigo = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction);
+                descripcion = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
+                        .replace("{}", cuentaCliente);
+            } catch (Exception ex2) {
+                // fallback por si falla la lectura del properties
+                codigo = Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO;
+                descripcion = Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION.replace("{}", cuentaCliente);
+            }
 
-	}
+            return new DiagnosticoResponse(
+                    "OK",
+                    ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
+                    List.of(new DiagnosticoDto(cuentaCliente, codigo, descripcion))
+            );
+
+        }
+
+    }
 
 }

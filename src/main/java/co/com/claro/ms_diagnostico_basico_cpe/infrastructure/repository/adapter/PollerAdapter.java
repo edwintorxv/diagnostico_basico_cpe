@@ -9,6 +9,9 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseCm
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseGetWifiData;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseWifiDataClient;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Collections;
@@ -26,9 +29,6 @@ public class PollerAdapter implements IPollerPortOut {
 
     private final RestTemplate restTemplate;
 
-    @Value("${poller.service.url}")
-    private String pollerServiceUrl;
-    
     @Value("${poller.service.arp.url}")
     private String pollerServiceArpUrl;
     
@@ -51,7 +51,7 @@ public class PollerAdapter implements IPollerPortOut {
             HttpEntity<InventarioPorClienteRequest> entity = new HttpEntity<>(request, httpHeaders);
 
             ResponseEntity<InventarioPorClienteResponse> response = restTemplate.exchange(
-                    pollerServiceUrl,
+                    ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_URL, Transaction.startTransaction()),
                     HttpMethod.POST,
                     entity,
                     InventarioPorClienteResponse.class
@@ -66,7 +66,7 @@ public class PollerAdapter implements IPollerPortOut {
     }
     
     @Override
-    public List<ResponseArpPollerDto> consultarARP(String mac) { 
+    public List<ResponseArpPollerDto> consultarARP(String mac) {
         String finalUrl = pollerServiceArpUrl + mac;
 
         try {

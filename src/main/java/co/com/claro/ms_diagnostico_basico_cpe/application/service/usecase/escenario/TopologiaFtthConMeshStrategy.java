@@ -13,6 +13,8 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.Diagn
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ import java.util.Optional;
 
 @Service
 public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStrategy {
+
+    Transaction transaction = Transaction.startTransaction();
 
     private final ConsultarParametrosDipositivosService consultarParametrosDipositivosService;
     private final MacAdreesValidator macAdreesValidator;
@@ -39,10 +43,12 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
 
     @Override
     public DiagnosticoResponse diagnosticar(InventarioPorTopoligiaDto topologia,
-                                                IAcsPortOut acsPortOut) {
+                                            IAcsPortOut acsPortOut) {
+
 
         final String cuentaCliente = topologia.getCuentaCliente();
 
+        Transaction transaction = Transaction.startTransaction();
         try {
 
             InventarioPorClienteDto cpePrincipal = topologia.getInventarioCPE();
@@ -50,7 +56,7 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                     .orElseGet(List::of);
 
             if (cpePrincipal == null) {
-                return HelperMesh.errorInventario(cuentaCliente);
+                return HelperMesh.errorInventario(cuentaCliente, transaction);
             }
 
             List<InventarioPorClienteDto> equipos = new ArrayList<>();
@@ -67,8 +73,8 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             DeviceParamsDto dtoOnt = HelperMesh.buildDeviceParamsDto(
                     cpePrincipal.getSerialNumber(),
                     String.format(Constantes.KEY_OR_TREE_ONT,
-                    		HelperMesh.safeLower(cpePrincipal.getMarca()),
-                    		HelperMesh.safeLower(cpePrincipal.getModelo()).replace(" ", "-")),
+                            HelperMesh.safeLower(cpePrincipal.getMarca()),
+                            HelperMesh.safeLower(cpePrincipal.getModelo()).replace(" ", "-")),
                     cpePrincipal.getMarca(),
                     cpePrincipal.getModelo()
             );
@@ -76,15 +82,15 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             DeviceStatusResponse deviceStatus = acsPortOut.obtenerEstadoPorSerial(cpePrincipal.getSerialNumber());
             if (deviceStatus == null || deviceStatus.getData() == null || deviceStatus.getData().isEmpty()) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.FTTH_NO_ONLINE_CODIGO,
-                        Constantes.FTTH_NO_ONLINE_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_DESCRIPCION, transaction));
             }
 
             DeviceStatusDto statusDto = deviceStatus.getData().get(0);
             if (statusDto == null || "false".equalsIgnoreCase(statusDto.getOnline())) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.FTTH_NO_ONLINE_CODIGO,
-                        Constantes.FTTH_NO_ONLINE_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_DESCRIPCION, transaction));
             }
 
             // 2) Parámetros ONT
@@ -105,37 +111,37 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             long conteoCoincidenciasOnt = macsOnt.stream().filter(seriales::contains).count();
             if (conteoCoincidenciasOnt > 1) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION, transaction));
             }
 
             // 4) Buscar AP maestro en inventario
             InventarioPorClienteDto meshMaster = HelperMesh.findInventarioCoincidente(equipos, macsOnt);
             if (meshMaster == null) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION, transaction));
             }
-            
+
 
             // Validar estado AP maestro
             if (!HelperMesh.estaOnline(HelperMesh.serialPreferido(meshMaster), acsPortOut)) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION, transaction));
             }
 
             // 5) Consultar parámetros AP maestro
             DeviceParamsDto dtoMesh = HelperMesh.buildDeviceParamsDto(
-            		HelperMesh.serialPreferido(meshMaster),
+                    HelperMesh.serialPreferido(meshMaster),
                     Constantes.KEY_OR_TREE_MESH,
                     HelperMesh.safeLower(meshMaster.getMarca()),
                     meshMaster.getModelo()
             );
 
-            
+
             DeviceParamsResponse responseMesh = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoMesh);
-            
+
             if (HelperMesh.isAcsDataEmpty(responseMesh)) {
                 return HelperMesh.diagnostico(cuentaCliente,
                         Constantes.ACS_NO_REPORTA_DATA_CODIGO,
@@ -148,19 +154,19 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
 
             if (macsMesh.stream().filter(seriales::contains).count() == 0) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION, transaction));
             }
 
             // 6) Buscar AP esclavo
             InventarioPorClienteDto meshSlave = HelperMesh.findInventarioCoincidente(equipos, macsMesh);
             if (meshSlave == null) {
-                return HelperMesh.errorInventario(cuentaCliente);
+                return HelperMesh.errorInventario(cuentaCliente, transaction);
             }
 
             // Consultar AP esclavo
             DeviceParamsDto dtoSlave = HelperMesh.buildDeviceParamsDto(
-            		HelperMesh.serialPreferido(meshSlave),
+                    HelperMesh.serialPreferido(meshSlave),
                     Constantes.KEY_OR_TREE_MESH,
                     meshMaster.getMarca(),
                     meshMaster.getModelo()
@@ -178,37 +184,44 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             // 7) Diagnósticos finales de canales
             if (!wifiSlaveOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION, transaction));
             }
             if (wifiOntOk && wifiSlaveOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION, transaction));
             }
             if (!wifiOntOk && wifiSlaveOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO,
-                        Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION, transaction));
             }
 
-            return HelperMesh.errorInventario(cuentaCliente);
+            return HelperMesh.errorInventario(cuentaCliente, transaction);
 
 
         } catch (Exception e) {
+            String codigo;
+            String descripcion;
+            try {
+                codigo = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction);
+                descripcion = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
+                        .replace("{}", cuentaCliente);
+            } catch (Exception ex2) {
+                // fallback por si falla la lectura del properties
+                codigo = Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO;
+                descripcion = Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION.replace("{}", cuentaCliente);
+            }
+
             return new DiagnosticoResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                    List.of(new DiagnosticoDto(
-                            cuentaCliente,
-                            Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
-                            String.format(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, cuentaCliente)
-                    ))
+                    List.of(new DiagnosticoDto(cuentaCliente, codigo, descripcion))
             );
 
         }
     }
 
-    
 
 }

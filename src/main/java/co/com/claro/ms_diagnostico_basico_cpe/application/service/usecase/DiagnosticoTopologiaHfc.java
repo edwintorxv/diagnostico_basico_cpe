@@ -2,6 +2,8 @@ package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase;
 
 import java.util.List;
 
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
 import org.springframework.stereotype.Service;
 
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.DiagnosticoTopologiaHfcStrategy;
@@ -23,62 +25,64 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
-	
-	private final IAcsPortOut acsPortOut;
+
+    private final IAcsPortOut acsPortOut;
     private final IPollerPortOut pollerPortOut;
-    
+
     private final TopologiaHfcSinMeshStrategy hfcSinMeshsStrategy;
     private final TopologiaHfcConMeshStrategy hfcConMeshsStrategy;
     //private final InventarioPorTopoligiaDto inventarioPoller;
     private final InventarioPoller inventarioPoller;
 
-	@Override
-	public DiagnosticoResponse diagnosticoTopologiaHfc(String cuentaCliente) throws Exception {
-		
-		
-		 InventarioPorTopoligiaDto inventarioTopologiaHfc =
-	                inventarioPoller.consultarInventario(cuentaCliente, "hfc");
+    @Override
+    public DiagnosticoResponse diagnosticoTopologiaHfc(String cuentaCliente) throws Exception {
 
-	        if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
-	            return new DiagnosticoResponse(
-	                    "OK",
-	                    ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-	                    List.of(new DiagnosticoDto(
-	                            cuentaCliente,
-	                            Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
-	                            String.format(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, cuentaCliente)
-	                    ))
-	            );
-	        }
-	        
-	        //Validar si el cable Modem esta conectado  
-	        String formatearMac = HelperMesh.formatMacAddress(inventarioTopologiaHfc.getInventarioCPE().getSerialMac());
-	        List<ResponseCmDataPollerDto> getCmData = pollerPortOut.consultarCMData(formatearMac);
-			 
-			 if (getCmData == null || getCmData.isEmpty()) {
-				 return HelperMesh.diagnostico(cuentaCliente,
-	                     "300",
-	                     "No es posible consultar el CM");
-		     }
-			 
-			 ResponseCmDataPollerDto getEstadoBandas = (ResponseCmDataPollerDto) getCmData.get(0);
-			 
-			 if ("false".equalsIgnoreCase(getEstadoBandas.getAlive())) {
-					return HelperMesh.diagnostico(cuentaCliente, "300",
-							"No es posible consultar el CM");
-				 
-			 }
-		
-	        
-	        DiagnosticoTopologiaHfcStrategy strategy =
-	                (inventarioTopologiaHfc.getLstinventarioMesh() == null || inventarioTopologiaHfc.getLstinventarioMesh().isEmpty())
-	                        ? hfcSinMeshsStrategy
-	                        : hfcConMeshsStrategy;
+        Transaction transaction = Transaction.startTransaction();
 
-	        return strategy.diagnosticar(inventarioTopologiaHfc, pollerPortOut, acsPortOut);
-		
-	}
-	
-	
+        InventarioPorTopoligiaDto inventarioTopologiaHfc =
+                inventarioPoller.consultarInventario(cuentaCliente, "hfc");
+
+        if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
+            return new DiagnosticoResponse(
+                    "OK",
+                    ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
+                    List.of(new DiagnosticoDto(
+                            cuentaCliente,
+                            ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
+                            ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
+                                    .replace("{}", cuentaCliente)
+                    ))
+            );
+        }
+
+        //Validar si el cable Modem esta conectado
+        String formatearMac = HelperMesh.formatMacAddress(inventarioTopologiaHfc.getInventarioCPE().getSerialMac());
+        List<ResponseCmDataPollerDto> getCmData = pollerPortOut.consultarCMData(formatearMac);
+
+        if (getCmData == null || getCmData.isEmpty()) {
+            return HelperMesh.diagnostico(cuentaCliente,
+                    "300",
+                    "No es posible consultar el CM");
+        }
+
+        ResponseCmDataPollerDto getEstadoBandas = (ResponseCmDataPollerDto) getCmData.get(0);
+
+        if ("false".equalsIgnoreCase(getEstadoBandas.getAlive())) {
+            return HelperMesh.diagnostico(cuentaCliente,
+                    ParametersConfig.getPropertyValue(Constantes.HFC_NO_ONLINE_CODIGO, transaction),
+                    ParametersConfig.getPropertyValue(Constantes.HFC_NO_ONLINE_DESCRIPCION, transaction));
+
+        }
+
+
+        DiagnosticoTopologiaHfcStrategy strategy =
+                (inventarioTopologiaHfc.getLstinventarioMesh() == null || inventarioTopologiaHfc.getLstinventarioMesh().isEmpty())
+                        ? hfcSinMeshsStrategy
+                        : hfcConMeshsStrategy;
+
+        return strategy.diagnosticar(inventarioTopologiaHfc, pollerPortOut, acsPortOut);
+
+    }
+
 
 }
