@@ -158,14 +158,16 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION, transaction));
             }
 
-            // 6) Buscar AP esclavo
+            boolean wifiMeshOk = canalWifiValidator.validar(responseMesh, dtoMesh.getKeyOrTree());
+
+            /*// 6) Buscar AP esclavo
             InventarioPorClienteDto meshSlave = HelperMesh.findInventarioCoincidente(equipos, macsMesh);
             if (meshSlave == null) {
                 return HelperMesh.errorInventario(cuentaCliente, transaction);
-            }
+            }*/
 
             // Consultar AP esclavo
-            DeviceParamsDto dtoSlave = HelperMesh.buildDeviceParamsDto(
+            /*DeviceParamsDto dtoSlave = HelperMesh.buildDeviceParamsDto(
                     HelperMesh.serialPreferido(meshSlave),
                     Constantes.KEY_OR_TREE_MESH,
                     meshMaster.getMarca(),
@@ -175,8 +177,8 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             DeviceParamsResponse responseSlave = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoSlave);
             if (HelperMesh.isAcsDataEmpty(responseSlave)) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, transaction));
             }
 
             boolean wifiSlaveOk = canalWifiValidator.validar(responseSlave, dtoSlave.getKeyOrTree());
@@ -186,13 +188,14 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                 return HelperMesh.diagnostico(cuentaCliente,
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO, transaction),
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION, transaction));
-            }
-            if (wifiOntOk && wifiSlaveOk) {
+            }*/
+
+            if (wifiOntOk && wifiMeshOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO, transaction),
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION, transaction));
             }
-            if (!wifiOntOk && wifiSlaveOk) {
+            if (!wifiOntOk && wifiMeshOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO, transaction),
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION, transaction));
