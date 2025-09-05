@@ -36,20 +36,23 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
     @Override
     public DiagnosticoResponse diagnosticoTopologiaHfc(String cuentaCliente) throws Exception {
 
+        int longitudCuenta = 8;
+        String formatoCuentaCliente = String.format("%1$" + longitudCuenta + "s", cuentaCliente).replace(' ', '0');
+
         Transaction transaction = Transaction.startTransaction();
 
         InventarioPorTopoligiaDto inventarioTopologiaHfc =
-                inventarioPoller.consultarInventario(cuentaCliente, "hfc");
+                inventarioPoller.consultarInventario(formatoCuentaCliente, "hfc");
 
         if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
             return new DiagnosticoResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                     List.of(new DiagnosticoDto(
-                            cuentaCliente,
+                            formatoCuentaCliente,
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
-                                    .replace("{}", cuentaCliente)
+                                    .replace("{}", formatoCuentaCliente)
                     ))
             );
         }
