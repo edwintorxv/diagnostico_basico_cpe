@@ -39,9 +39,12 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
     @Override
     public DiagnosticoResponse diagnosticoTopologiaFtth(String cuentaCliente) throws Exception {
 
+        int longitudCuenta = 8;
+        String formatoCuentaCliente = String.format("%1$" + longitudCuenta + "s", cuentaCliente).replace(' ', '0');
+
 
         InventarioPorTopoligiaDto inventarioTopologiaFtth =
-                inventarioPoller.consultarInventario(cuentaCliente, "ftth");
+                inventarioPoller.consultarInventario(formatoCuentaCliente, "ftth");
 
         if (inventarioTopologiaFtth == null || inventarioTopologiaFtth.getInventarioCPE() == null) {
             return new DiagnosticoResponse(
@@ -51,7 +54,7 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
                             cuentaCliente,
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
-                                    .replace("{}", cuentaCliente)
+                                    .replace("{}", formatoCuentaCliente)
                     ))
             );
         }

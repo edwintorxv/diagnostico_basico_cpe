@@ -1,13 +1,6 @@
 package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.repository.adapter;
 
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteRequest;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseArpDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseArpPollerDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseCmDataDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseCmDataPollerDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseGetWifiData;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseWifiDataClient;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.*;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
@@ -122,4 +115,9 @@ public class PollerAdapter implements IPollerPortOut {
 	        throw new RuntimeException("Error al consumir el servicio de Poller consultarCMBandas para la MAC: " + mac, e);
 	    }
 	}
+
+    @Override
+    public List<ResponseNeighborStatusDto> obtenerVecinos(RequestNeighborStatusDto neighborStatusDto) throws Exception {
+        return List.of();
+    }
 }

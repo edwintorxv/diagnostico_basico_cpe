@@ -1,25 +1,25 @@
 package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase;
 
-import java.util.List;
-
-import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
-import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
-import org.springframework.stereotype.Service;
-
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.DiagnosticoTopologiaHfcStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaHfcConMeshStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaHfcSinMeshStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperMesh;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoHfcLineaBaseResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseCmDataPollerDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.diagnostico.IDiagnosticoHFCPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -31,7 +31,6 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
 
     private final TopologiaHfcSinMeshStrategy hfcSinMeshsStrategy;
     private final TopologiaHfcConMeshStrategy hfcConMeshsStrategy;
-    //private final InventarioPorTopoligiaDto inventarioPoller;
     private final InventarioPoller inventarioPoller;
 
     @Override
@@ -82,6 +81,31 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
 
         return strategy.diagnosticar(inventarioTopologiaHfc, pollerPortOut, acsPortOut);
 
+    }
+
+    @Override
+    public DiagnosticoResponse diagnosticoLineaBaseHfc(String cuentaCliente) throws Exception {
+
+        Transaction transaction = Transaction.startTransaction();
+
+        InventarioPorTopoligiaDto inventarioTopologiaHfc =
+                inventarioPoller.consultarInventario(cuentaCliente, "hfc");
+
+        if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
+            return new DiagnosticoResponse(
+                    "OK",
+                    ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
+                    List.of(new DiagnosticoDto(
+                            cuentaCliente,
+                            ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
+                            ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
+                                    .replace("{}", cuentaCliente)
+                    ))
+            );
+        }
+
+
+        return null;
     }
 
 

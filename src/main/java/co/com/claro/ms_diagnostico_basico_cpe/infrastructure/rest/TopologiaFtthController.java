@@ -18,7 +18,7 @@ public class TopologiaFtthController {
     private final DiagnosticoTopologiaFtthAdapter diagnosticoAdapter;
 
     @GetMapping("/topologiaONT/{cuentaCliente}")
-    public ResponseEntity<DiagnosticoResponse> diagnosticoTopologiaFtth(@PathVariable String cuentaCliente) throws Exception{
+    public ResponseEntity<DiagnosticoResponse> diagnosticoTopologiaFtth(@PathVariable String cuentaCliente) throws Exception {
         return diagnosticoAdapter.diagnosticoTopologiaFtth(cuentaCliente);
     }
 }
