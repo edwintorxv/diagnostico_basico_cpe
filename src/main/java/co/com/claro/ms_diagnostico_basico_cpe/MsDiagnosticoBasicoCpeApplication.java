@@ -1,18 +1,17 @@
 package co.com.claro.ms_diagnostico_basico_cpe;
 
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
-import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.rest.configuration.properties.WifiChannelProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties(WifiChannelProperties.class)
+//@EnableConfigurationProperties(WifiChannelProperties.class)
 public class MsDiagnosticoBasicoCpeApplication {
 
     public static void main(String[] args) {
         ParametersConfig.init(SpringApplication.run(MsDiagnosticoBasicoCpeApplication.class, args)
                 .getEnvironment().getProperty("spring.application.name", "default-app"));
+
     }
 
 }

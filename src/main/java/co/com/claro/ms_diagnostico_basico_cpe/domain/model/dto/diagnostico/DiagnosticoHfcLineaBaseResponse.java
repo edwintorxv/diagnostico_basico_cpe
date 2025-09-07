@@ -10,12 +10,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiagnosticoFtthResponse extends GenericResponseDto {
+public class DiagnosticoHfcLineaBaseResponse extends GenericResponseDto {
 
-    private List<DiagnosticoFtthDto> data;
+    private List<DiagnosticoHfcLineaBaseDto> data;
 
-    public DiagnosticoFtthResponse(String status, String message, List<DiagnosticoFtthDto> data) {
-        super(status, message); // Llama al constructor de GenericResponseDto
-        this.data = data;
-    }
 }

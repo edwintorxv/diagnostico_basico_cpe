@@ -1,17 +1,20 @@
 package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario;
 
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.ConsultarParametrosDipositivosService;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperMesh;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.validator.CanalWifiValidator;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.validator.MacAdreesValidator;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ import java.util.Optional;
 
 @Service
 public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStrategy {
+
+    Transaction transaction = Transaction.startTransaction();
 
     private final ConsultarParametrosDipositivosService consultarParametrosDipositivosService;
     private final MacAdreesValidator macAdreesValidator;
@@ -37,11 +42,13 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
     }
 
     @Override
-    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto topologia,
-                                                IAcsPortOut acsPortOut) {
+    public DiagnosticoResponse diagnosticar(InventarioPorTopoligiaDto topologia,
+                                            IAcsPortOut acsPortOut) {
+
 
         final String cuentaCliente = topologia.getCuentaCliente();
 
+        Transaction transaction = Transaction.startTransaction();
         try {
 
             InventarioPorClienteDto cpePrincipal = topologia.getInventarioCPE();
@@ -49,7 +56,7 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                     .orElseGet(List::of);
 
             if (cpePrincipal == null) {
-                return errorInventario(cuentaCliente);
+                return HelperMesh.errorInventario(cuentaCliente, transaction);
             }
 
             List<InventarioPorClienteDto> equipos = new ArrayList<>();
@@ -58,43 +65,43 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
 
 
             List<String> seriales = equipos.stream()
-                    .map(this::serialInventarioNormalizado) // toma serialNumber o serialMac
+                    .map(HelperMesh::serialInventarioNormalizado) // toma serialNumber o serialMac
                     .filter(Objects::nonNull)
                     .toList();
 
 
-            DeviceParamsDto dtoOnt = buildDeviceParamsDto(
+            DeviceParamsDto dtoOnt = HelperMesh.buildDeviceParamsDto(
                     cpePrincipal.getSerialNumber(),
                     String.format(Constantes.KEY_OR_TREE_ONT,
-                            safeLower(cpePrincipal.getMarca()),
-                            safeLower(cpePrincipal.getModelo()).replace(" ", "-")),
+                            HelperMesh.safeLower(cpePrincipal.getMarca()),
+                            HelperMesh.safeLower(cpePrincipal.getModelo()).replace(" ", "-")),
                     cpePrincipal.getMarca(),
                     cpePrincipal.getModelo()
             );
 
             DeviceStatusResponse deviceStatus = acsPortOut.obtenerEstadoPorSerial(cpePrincipal.getSerialNumber());
             if (deviceStatus == null || deviceStatus.getData() == null || deviceStatus.getData().isEmpty()) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_NO_ONLINE_CODIGO,
-                        Constantes.ONT_NO_ONLINE_DESCRIPCION);
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_DESCRIPCION, transaction));
             }
 
             DeviceStatusDto statusDto = deviceStatus.getData().get(0);
             if (statusDto == null || "false".equalsIgnoreCase(statusDto.getOnline())) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_NO_ONLINE_CODIGO,
-                        Constantes.ONT_NO_ONLINE_DESCRIPCION);
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_DESCRIPCION, transaction));
             }
 
             // 2) Parámetros ONT
             DeviceParamsResponse responseOnt = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoOnt);
-            if (isAcsDataEmpty(responseOnt)) {
-                return diagnostico(cuentaCliente,
+            if (HelperMesh.isAcsDataEmpty(responseOnt)) {
+                return HelperMesh.diagnostico(cuentaCliente,
                         Constantes.ACS_NO_REPORTA_DATA_CODIGO,
                         Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
             }
 
-            List<String> macsOnt = normalizarListaMac(
+            List<String> macsOnt = HelperMesh.normalizarListaMac(
                     macAdreesValidator.macAddressDetectadas(responseOnt, dtoOnt.getKeyOrTree())
             );
 
@@ -103,194 +110,121 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             // 3) Validar cantidad de MAC conectadas a ONT
             long conteoCoincidenciasOnt = macsOnt.stream().filter(seriales::contains).count();
             if (conteoCoincidenciasOnt > 1) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION);
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_MAS_DE_DOS_MAC_DESCRIPCION, transaction));
             }
 
             // 4) Buscar AP maestro en inventario
-            InventarioPorClienteDto meshMaster = findInventarioCoincidente(equipos, macsOnt);
+            InventarioPorClienteDto meshMaster = HelperMesh.findInventarioCoincidente(equipos, macsOnt);
             if (meshMaster == null) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION);
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION, transaction));
             }
 
+
             // Validar estado AP maestro
-            if (!estaOnline(serialPreferido(meshMaster), acsPortOut)) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION);
+            if (!HelperMesh.estaOnline(HelperMesh.serialPreferido(meshMaster), acsPortOut)) {
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION, transaction));
             }
 
             // 5) Consultar parámetros AP maestro
-            DeviceParamsDto dtoMesh = buildDeviceParamsDto(
-                    serialPreferido(meshMaster),
+            DeviceParamsDto dtoMesh = HelperMesh.buildDeviceParamsDto(
+                    HelperMesh.serialPreferido(meshMaster),
                     Constantes.KEY_OR_TREE_MESH,
-                    safeLower(meshMaster.getMarca()),
+                    HelperMesh.safeLower(meshMaster.getMarca()),
                     meshMaster.getModelo()
             );
 
+
             DeviceParamsResponse responseMesh = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoMesh);
-            if (isAcsDataEmpty(responseMesh)) {
-                return diagnostico(cuentaCliente,
+
+            if (HelperMesh.isAcsDataEmpty(responseMesh)) {
+                return HelperMesh.diagnostico(cuentaCliente,
                         Constantes.ACS_NO_REPORTA_DATA_CODIGO,
                         Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
             }
 
-            List<String> macsMesh = normalizarListaMac(
+            List<String> macsMesh = HelperMesh.normalizarListaMac(
                     macAdreesValidator.macAddressDetectadas(responseMesh, dtoMesh.getKeyOrTree())
             );
 
             if (macsMesh.stream().filter(seriales::contains).count() == 0) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION);
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION, transaction));
             }
 
-            // 6) Buscar AP esclavo
-            InventarioPorClienteDto meshSlave = findInventarioCoincidente(equipos, macsMesh);
+            boolean wifiMeshOk = canalWifiValidator.validar(responseMesh, dtoMesh.getKeyOrTree());
+
+            /*// 6) Buscar AP esclavo
+            InventarioPorClienteDto meshSlave = HelperMesh.findInventarioCoincidente(equipos, macsMesh);
             if (meshSlave == null) {
-                return errorInventario(cuentaCliente);
-            }
+                return HelperMesh.errorInventario(cuentaCliente, transaction);
+            }*/
 
             // Consultar AP esclavo
-            DeviceParamsDto dtoSlave = buildDeviceParamsDto(
-                    serialPreferido(meshSlave),
+            /*DeviceParamsDto dtoSlave = HelperMesh.buildDeviceParamsDto(
+                    HelperMesh.serialPreferido(meshSlave),
                     Constantes.KEY_OR_TREE_MESH,
                     meshMaster.getMarca(),
                     meshMaster.getModelo()
             );
 
             DeviceParamsResponse responseSlave = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoSlave);
-            if (isAcsDataEmpty(responseSlave)) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
+            if (HelperMesh.isAcsDataEmpty(responseSlave)) {
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, transaction));
             }
 
             boolean wifiSlaveOk = canalWifiValidator.validar(responseSlave, dtoSlave.getKeyOrTree());
 
             // 7) Diagnósticos finales de canales
             if (!wifiSlaveOk) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION);
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION, transaction));
+            }*/
+
+            if (wifiOntOk && wifiMeshOk) {
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION, transaction));
             }
-            if (wifiOntOk && wifiSlaveOk) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION);
-            }
-            if (!wifiOntOk && wifiSlaveOk) {
-                return diagnostico(cuentaCliente,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO,
-                        Constantes.ONT_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION);
+            if (!wifiOntOk && wifiMeshOk) {
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION, transaction));
             }
 
-            return errorInventario(cuentaCliente);
+            return HelperMesh.errorInventario(cuentaCliente, transaction);
 
 
         } catch (Exception e) {
-            return new DiagnosticoFtthResponse(
+            String codigo;
+            String descripcion;
+            try {
+                codigo = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction);
+                descripcion = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
+                        .replace("{}", cuentaCliente);
+            } catch (Exception ex2) {
+                // fallback por si falla la lectura del properties
+                codigo = Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO;
+                descripcion = Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION.replace("{}", cuentaCliente);
+            }
+
+            return new DiagnosticoResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                    List.of(new DiagnosticoFtthDto(
-                            cuentaCliente,
-                            Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
-                            String.format(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, cuentaCliente)
-                    ))
+                    List.of(new DiagnosticoDto(cuentaCliente, codigo, descripcion))
             );
 
         }
     }
 
-    private DiagnosticoFtthResponse errorInventario(String cuentaCliente) {
-        return new DiagnosticoFtthResponse(
-                "OK",
-                ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                List.of(new DiagnosticoFtthDto(
-                        cuentaCliente,
-                        Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO,
-                        String.format(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, cuentaCliente)
-                ))
-        );
-    }
-
-    private DeviceParamsDto buildDeviceParamsDto(String serial, String keyTemplate, String marca, String modelo) {
-        DeviceParamsDto dto = new DeviceParamsDto();
-        dto.setDevicesn(serial);
-        dto.setSource("1");
-        dto.setOUI("");
-        dto.setModelname("");
-        dto.setNames(true);
-        dto.setValues(false);
-        dto.setAttributes(true);
-        dto.setCreator("");
-        dto.setAppid("");
-        dto.setKeyOrTree(String.format(keyTemplate, marca, modelo.replace(" ", "-").toLowerCase()));
-        return dto;
-    }
-
-    private DiagnosticoFtthResponse diagnostico(String cuenta, String codigo, String descripcion) {
-        return new DiagnosticoFtthResponse("OK",
-                ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                List.of(new DiagnosticoFtthDto(
-                        cuenta,
-                        codigo,
-                        descripcion
-                ))
-        );
-    }
-
-    private InventarioPorClienteDto findInventarioCoincidente(List<InventarioPorClienteDto> inventario, List<String> macs) {
-        return inventario.stream()
-                .filter(i -> i.getSerialNumber() != null)
-                .filter(i -> macs.contains(i.getSerialNumber().replace(":", "").toUpperCase()))
-                .findFirst()
-                .orElse(null);
-    }
-
-    private boolean estaOnline(String serial, IAcsPortOut acsPortOut) throws Exception {
-        DeviceStatusResponse status = acsPortOut.obtenerEstadoPorSerial(serial);
-        return status.getData() != null &&
-                status.getData().stream().anyMatch(d -> "true".equalsIgnoreCase(d.getOnline()));
-    }
-
-    //Valida que ACS no retorne null o vacios
-    private boolean isAcsDataEmpty(DeviceParamsResponse response) {
-        return response == null
-                || response.getData() == null
-                || response.getData().isEmpty()
-                || response.getData().get(0).getParams() == null
-                || response.getData().get(0).getParams().isEmpty();
-    }
-
-    private String norm(String s) {
-        return (s == null) ? null : s.replace(":", "").toUpperCase();
-    }
-
-    private String safeLower(String s) {
-        return s == null ? "" : s.toLowerCase();
-    }
-
-    private String serialInventarioNormalizado(InventarioPorClienteDto i) {
-        // Usa serialNumber si existe; si no, serialMac
-        String raw = (i.getSerialNumber() != null && !i.getSerialNumber().isEmpty())
-                ? i.getSerialNumber()
-                : i.getSerialMac();
-        return norm(raw);
-    }
-
-    private List<String> normalizarListaMac(List<String> macs) {
-        if (macs == null) return List.of();
-        return macs.stream().map(this::norm).filter(Objects::nonNull).toList();
-    }
-
-    private String serialPreferido(InventarioPorClienteDto i) {
-        return (i.getSerialMac() != null && !i.getSerialMac().isEmpty())
-                ? i.getSerialMac()
-                : i.getSerialNumber();
-    }
 
 }
