@@ -3,6 +3,7 @@ package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.DiagnosticoTopologiaFtthStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaFtthConMeshStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaFtthSinMeshStrategy;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperMesh;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
@@ -39,12 +40,11 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
     @Override
     public DiagnosticoResponse diagnosticoTopologiaFtth(String cuentaCliente) throws Exception {
 
-        int longitudCuenta = 8;
-        String formatoCuentaCliente = String.format("%1$" + longitudCuenta + "s", cuentaCliente).replace(' ', '0');
+        cuentaCliente = HelperMesh.formatCuentaCliente(cuentaCliente);
 
 
         InventarioPorTopoligiaDto inventarioTopologiaFtth =
-                inventarioPoller.consultarInventario(formatoCuentaCliente, "ftth");
+                inventarioPoller.consultarInventario(cuentaCliente, "ftth");
 
         if (inventarioTopologiaFtth == null || inventarioTopologiaFtth.getInventarioCPE() == null) {
             return new DiagnosticoResponse(
@@ -54,7 +54,7 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
                             cuentaCliente,
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
-                                    .replace("{}", formatoCuentaCliente)
+                                    .replace("{}", cuentaCliente)
                     ))
             );
         }

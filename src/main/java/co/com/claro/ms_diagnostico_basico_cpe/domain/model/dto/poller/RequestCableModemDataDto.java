@@ -1,6 +1,5 @@
 package co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,10 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RequestNeighborStatusDto {
+public class RequestCableModemDataDto {
 
-    private ResponseCmDataPollerDto cableModemDto;
-    private Integer samples;
-    private Boolean geodistanceQuery;
-
+    private String modelo;
 }

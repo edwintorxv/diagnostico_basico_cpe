@@ -1,8 +1,8 @@
 package co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller;
 
-import java.util.List;
-
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.*;
+
+import java.util.List;
 
 
 public interface IPollerPortOut {
@@ -15,6 +15,11 @@ public interface IPollerPortOut {
 
     List<ResponseGetWifiData> consultarCMBandas(String mac) throws Exception;
 
-    List<ResponseNeighborStatusDto> obtenerVecinos(RequestNeighborStatusDto neighborStatusDto) throws Exception;
+    ResponseNeighborStatusDto obtenerVecinos(RequestNeighborStatusDto neighborStatusDto) throws Exception;
+
+    ResponseProvisioningDataDto obtenerAprovisionamiento(RequestProvisioningDataDto provisioningDataDto) throws Exception;
+
+    ResponseCableModemDataDto obtenerDataCableModem(RequestCableModemDataDto requestCableModemDataDto) throws Exception;
+
 
 }

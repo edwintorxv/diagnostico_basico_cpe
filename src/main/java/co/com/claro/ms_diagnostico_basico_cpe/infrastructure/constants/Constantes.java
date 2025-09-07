@@ -44,7 +44,7 @@ public class Constantes {
 
 
     public static final String HFC_NO_ONLINE_CODIGO = "hfc_no_online_codigo";
-    public static final String HFC_NO_ONLINE_DESCRIPCION = "No es posible consultar el CM";
+    public static final String HFC_NO_ONLINE_DESCRIPCION = "hfc_no_online_descripcion";
 
     public static final String HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_CODIGO = "hfc_online_con_ultrawifi_no_detectada_apmaestro_codigo";
     public static final String HFC_ONLINE_CON_ULTRAWIFI_NO_DETECTADA_APMAESTRO_DESCRIPCION = "hfc_online_con_ultrawifi_no_detectada_apmaestro_descripcion";
@@ -77,6 +77,9 @@ public class Constantes {
 
 
     public static final String POLLER_SERVICE_URL = "poller_service_url";
+    public static final String POLLER_SERVICE_NEIGHBORS = "poller.service.neighborsStatus";
+    public static final String POLLER_SERVICE_PROVISIONING_DATA = "poller.service.provisioning.data";
+    public static final String POLLER_SERVICE_CABLE_MODEM_DATA = "poller.service.cable.modem.data";
     public static final String POLLER_SERVICE_ARP_URL = "poller_service_arp_url";
     public static final String POLLER_SERVICE_GETESTADOCM_URL = "poller_service_getestadocm_url";
     public static final String POLLER_SERVICE_GETCONSULTABANDA_URL = "poller_service_getconsultabanda_url";

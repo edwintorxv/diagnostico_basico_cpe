@@ -127,4 +127,12 @@ public class HelperMesh {
         return macConFormato.replace(":", "");
     }
 
+    public static String formatCuentaCliente(String cuentaCliente){
+
+        int longitudCuenta = 8;
+        String formatoCuentaCliente = String.format("%1$" + longitudCuenta + "s", cuentaCliente).replace(' ', '0');
+
+        return formatoCuentaCliente;
+    }
+
 }

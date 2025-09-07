@@ -24,14 +24,14 @@ public class PollerAdapter implements IPollerPortOut {
 
     @Value("${poller.service.arp.url}")
     private String pollerServiceArpUrl;
-    
+
     @Value("${poller.service.getestadocm.url}")
     private String pollerServiceGetACM;
-   
+
     @Value("${poller.service.getconsultabanda.url}")
     private String pollerServiceConsultaBanda;
-    
-    
+
+
     @Override
     public InventarioPorClienteResponse obtenerInventarioPorCliente(InventarioPorClienteRequest request) throws Exception {
 
@@ -43,12 +43,7 @@ public class PollerAdapter implements IPollerPortOut {
 
             HttpEntity<InventarioPorClienteRequest> entity = new HttpEntity<>(request, httpHeaders);
 
-            ResponseEntity<InventarioPorClienteResponse> response = restTemplate.exchange(
-                    ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_URL, Transaction.startTransaction()),
-                    HttpMethod.POST,
-                    entity,
-                    InventarioPorClienteResponse.class
-            );
+            ResponseEntity<InventarioPorClienteResponse> response = restTemplate.exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_URL, Transaction.startTransaction()), HttpMethod.POST, entity, InventarioPorClienteResponse.class);
 
             return response.getBody();
 
@@ -57,15 +52,15 @@ public class PollerAdapter implements IPollerPortOut {
 
         }
     }
-    
+
     @Override
     public List<ResponseArpPollerDto> consultarARP(String mac) {
         String finalUrl = pollerServiceArpUrl + mac;
 
         try {
-  
-        	ResponseArpDto apiResponse = restTemplate.getForObject(finalUrl, ResponseArpDto.class);
-            
+
+            ResponseArpDto apiResponse = restTemplate.getForObject(finalUrl, ResponseArpDto.class);
+
             if (apiResponse != null && apiResponse.getData() != null) {
                 return apiResponse.getData();
             } else {
@@ -77,14 +72,14 @@ public class PollerAdapter implements IPollerPortOut {
         }
     }
 
-	@Override
-	public List<ResponseCmDataPollerDto> consultarCMData(String mac) throws Exception {
-		String finalUrl = pollerServiceGetACM + mac;
+    @Override
+    public List<ResponseCmDataPollerDto> consultarCMData(String mac) throws Exception {
+        String finalUrl = pollerServiceGetACM + mac;
 
         try {
-  
-        	ResponseCmDataDto apiResponse = restTemplate.getForObject(finalUrl, ResponseCmDataDto.class);
-            
+
+            ResponseCmDataDto apiResponse = restTemplate.getForObject(finalUrl, ResponseCmDataDto.class);
+
             if (apiResponse != null && apiResponse.getData() != null) {
                 return apiResponse.getData();
             } else {
@@ -94,30 +89,100 @@ public class PollerAdapter implements IPollerPortOut {
         } catch (RestClientException e) {
             throw new RuntimeException("Error al consumir el servicio de Poller consultarCMData para la MAC: " + mac, e);
         }
-	}
-
-	@Override
-	public List<ResponseGetWifiData> consultarCMBandas(String mac) throws Exception {
-	    String finalUrl = pollerServiceConsultaBanda + mac;
-
-	    try {
-	     
-	        ResponseWifiDataClient apiResponse = restTemplate.getForObject(finalUrl, ResponseWifiDataClient.class);
-	        
-	        if (apiResponse != null && apiResponse.getData() != null) {
-	            // Devuelves la lista interna, que ahora coincide con la firma del método.
-	            return apiResponse.getData();
-	        } else {
-	            return Collections.emptyList();
-	        }
-
-	    } catch (RestClientException e) {
-	        throw new RuntimeException("Error al consumir el servicio de Poller consultarCMBandas para la MAC: " + mac, e);
-	    }
-	}
+    }
 
     @Override
-    public List<ResponseNeighborStatusDto> obtenerVecinos(RequestNeighborStatusDto neighborStatusDto) throws Exception {
-        return List.of();
+    public List<ResponseGetWifiData> consultarCMBandas(String mac) throws Exception {
+        String finalUrl = pollerServiceConsultaBanda + mac;
+
+        try {
+
+            ResponseWifiDataClient apiResponse = restTemplate.getForObject(finalUrl, ResponseWifiDataClient.class);
+
+            if (apiResponse != null && apiResponse.getData() != null) {
+                // Devuelves la lista interna, que ahora coincide con la firma del método.
+                return apiResponse.getData();
+            } else {
+                return Collections.emptyList();
+            }
+
+        } catch (RestClientException e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller consultarCMBandas para la MAC: " + mac, e);
+        }
+    }
+
+    @Override
+    public ResponseNeighborStatusDto obtenerVecinos(RequestNeighborStatusDto neighborStatusDto) throws Exception {
+
+        try {
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<RequestNeighborStatusDto> entity = new HttpEntity<>(neighborStatusDto, httpHeaders);
+
+            ResponseEntity<ResponseNeighborStatusDto> response = restTemplate
+                    .exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_NEIGHBORS, Transaction.startTransaction()),
+                            HttpMethod.POST,
+                            entity,
+                            ResponseNeighborStatusDto.class
+                    );
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+
+        }
+    }
+
+    @Override
+    public ResponseProvisioningDataDto obtenerAprovisionamiento(RequestProvisioningDataDto provisioningDataDto) throws Exception {
+
+        try {
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<RequestProvisioningDataDto> entity = new HttpEntity<>(provisioningDataDto, httpHeaders);
+
+            ResponseEntity<ResponseProvisioningDataDto> response = restTemplate
+                    .exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_PROVISIONING_DATA, Transaction.startTransaction()),
+                            HttpMethod.POST,
+                            entity,
+                            ResponseProvisioningDataDto.class
+                    );
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+
+        }
+
+    }
+
+    @Override
+    public ResponseCableModemDataDto obtenerDataCableModem(RequestCableModemDataDto requestCableModemDataDto) throws Exception {
+
+        try {
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<RequestCableModemDataDto> entity = new HttpEntity<>(requestCableModemDataDto, httpHeaders);
+
+            ResponseEntity<ResponseCableModemDataDto> response = restTemplate
+                    .exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_CABLE_MODEM_DATA,
+                                    Transaction.startTransaction()),
+                            HttpMethod.POST, entity, ResponseCableModemDataDto.class);
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+
+        }
     }
 }

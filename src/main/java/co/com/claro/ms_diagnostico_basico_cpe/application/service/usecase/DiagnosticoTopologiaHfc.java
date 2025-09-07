@@ -3,12 +3,13 @@ package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.DiagnosticoTopologiaHfcStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaHfcConMeshStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaHfcSinMeshStrategy;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperLineaBaseHfc;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperMesh;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoHfcLineaBaseDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoHfcLineaBaseResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseCmDataPollerDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.*;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.diagnostico.IDiagnosticoHFCPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
@@ -33,26 +34,26 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
     private final TopologiaHfcConMeshStrategy hfcConMeshsStrategy;
     private final InventarioPoller inventarioPoller;
 
+    private final HelperLineaBaseHfc helperLineaBaseHfc;
+
     @Override
     public DiagnosticoResponse diagnosticoTopologiaHfc(String cuentaCliente) throws Exception {
 
-        int longitudCuenta = 8;
-        String formatoCuentaCliente = String.format("%1$" + longitudCuenta + "s", cuentaCliente).replace(' ', '0');
-
         Transaction transaction = Transaction.startTransaction();
+        cuentaCliente = HelperMesh.formatCuentaCliente(cuentaCliente);
 
         InventarioPorTopoligiaDto inventarioTopologiaHfc =
-                inventarioPoller.consultarInventario(formatoCuentaCliente, "hfc");
+                inventarioPoller.consultarInventario(cuentaCliente, "hfc");
 
         if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
             return new DiagnosticoResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                     List.of(new DiagnosticoDto(
-                            formatoCuentaCliente,
+                            cuentaCliente,
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
-                                    .replace("{}", formatoCuentaCliente)
+                                    .replace("{}", cuentaCliente)
                     ))
             );
         }
@@ -76,7 +77,6 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
 
         }
 
-
         DiagnosticoTopologiaHfcStrategy strategy =
                 (inventarioTopologiaHfc.getLstinventarioMesh() == null || inventarioTopologiaHfc.getLstinventarioMesh().isEmpty())
                         ? hfcSinMeshsStrategy
@@ -87,29 +87,63 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
     }
 
     @Override
-    public DiagnosticoResponse diagnosticoLineaBaseHfc(String cuentaCliente) throws Exception {
+    public DiagnosticoHfcLineaBaseResponse diagnosticoLineaBaseHfc(String cuentaCliente) throws Exception {
 
         Transaction transaction = Transaction.startTransaction();
+        cuentaCliente = HelperMesh.formatCuentaCliente(cuentaCliente);
 
         InventarioPorTopoligiaDto inventarioTopologiaHfc =
                 inventarioPoller.consultarInventario(cuentaCliente, "hfc");
 
+        DiagnosticoHfcLineaBaseResponse response = new DiagnosticoHfcLineaBaseResponse();
+
         if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
-            return new DiagnosticoResponse(
-                    "OK",
-                    ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                    List.of(new DiagnosticoDto(
-                            cuentaCliente,
+            response.setStatus("Ok");
+            response.setMessage(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO);
+            response.setData(List.of(
+                    new DiagnosticoHfcLineaBaseDto(
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
-                                    .replace("{}", cuentaCliente)
-                    ))
-            );
+                                    .replace("{}", cuentaCliente),
+                            cuentaCliente,
+                            null,
+                            null
+                    )
+            ));
+            return response;
         }
 
+        //Validar si el cable Modem esta conectado
+        String formatoMacAddress;
+        formatoMacAddress = HelperMesh.formatMacAddress(inventarioTopologiaHfc.getInventarioCPE().getSerialMac());
 
-        return null;
+        ResponseCmDataPollerDto dataCableModem = helperLineaBaseHfc.responseCmDataPollerDto(formatoMacAddress);
+
+        //Validar estado del CM
+        if ("false".equalsIgnoreCase(dataCableModem.getAlive())) {
+            response.setStatus("Ok");
+            response.setMessage(ParametersConfig.getPropertyValue(Constantes.HFC_NO_ONLINE_DESCRIPCION, transaction));
+            response.setData(List.of(new DiagnosticoHfcLineaBaseDto(
+                    ParametersConfig.getPropertyValue(Constantes.HFC_NO_ONLINE_CODIGO, transaction),
+                    ParametersConfig.getPropertyValue(Constantes.HFC_NO_ONLINE_DESCRIPCION, transaction),
+                    cuentaCliente,
+                    null,
+                    null)));
+
+            return response;
+        }
+
+        //Recuperar listado de vecinos
+        List<NeighborStatusDto> vecinos = helperLineaBaseHfc.obtenerListadoVecinos(dataCableModem);
+
+        //Recuperar provisioningdata
+        List<ProvisioningDataDto> lstProvisioningData = helperLineaBaseHfc.aprovisionamientoCliente(dataCableModem);
+
+        //Recuperar data del cable modem
+        List<CableModemDataDto> lsCableModemDatDto = helperLineaBaseHfc.datosCableModemPorModelo(dataCableModem);
+
+
+        return response;
     }
-
 
 }
