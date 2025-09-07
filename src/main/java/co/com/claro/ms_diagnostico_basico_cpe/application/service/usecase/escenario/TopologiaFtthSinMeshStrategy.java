@@ -11,6 +11,8 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.Diagn
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,8 @@ import java.util.List;
 
 @Service
 public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStrategy {
+
+    Transaction transaction = Transaction.startTransaction();
 
     private final ConsultarParametrosDipositivosService consultarParametrosDipositivosService;
     private final CanalWifiValidator canalWifiValidator;
@@ -39,15 +43,15 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
 
             if (cpePrincipal == null) {
                 return diagnostico(cuentaCliente,
-                        "CPE_NO_ENCONTRADO",
-                        "No se encontró equipo principal FTTH en inventario");
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_CPE_NO_ENCONTRADO_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_CPE_NO_ENCONTRADO_DESCRIPCION, transaction));
             }
 
             DeviceStatusResponse deviceStatus = acsPortOut.obtenerEstadoPorSerial(cpePrincipal.getSerialNumber());
             if (deviceStatus == null || deviceStatus.getData().isEmpty()) {
                 return diagnostico(cuentaCliente,
-                        "SIN_RESPUESTA_ACS",
-                        "No se pudo obtener estado del CPE en ACS");
+                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, Transaction.startTransaction()),
+                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, Transaction.startTransaction()));
             }
 
 
@@ -55,8 +59,8 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
 
             if ("false".equalsIgnoreCase(statusDto.getOnline())) {
                 return diagnostico(cuentaCliente,
-                        Constantes.FTTH_NO_ONLINE_CODIGO,
-                        Constantes.FTTH_NO_ONLINE_DESCRIPCION);
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_NO_ONLINE_DESCRIPCION, transaction));
             }
 
             if (deviceStatus == null) {
@@ -66,8 +70,8 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
                         ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                         List.of(new DiagnosticoDto(
                                 cuentaCliente,
-                                "SIN_RESPUESTA_ACS",
-                                "No se pudo obtener estado del CPE en ACS"
+                                ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, Transaction.startTransaction()),
+                                ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, Transaction.startTransaction())
                         ))
                 );
             }
@@ -99,8 +103,8 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
                         ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                         List.of(new DiagnosticoDto(
                                 cuentaCliente,
-                                Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_CODIGO,
-                                Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_DESCRIPCION
+                                ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_ONLINE_DESCRIPCION, transaction)
                         ))
                 );
             } else {
@@ -110,8 +114,8 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
                         ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                         List.of(new DiagnosticoDto(
                                 cuentaCliente,
-                                Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_CODIGO,
-                                Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION
+                                ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_SIN_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION, transaction)
                         ))
                 );
             }
@@ -121,7 +125,7 @@ public class TopologiaFtthSinMeshStrategy implements DiagnosticoTopologiaFtthStr
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                     List.of(new DiagnosticoDto(cuentaCliente,
-                            "ERROR_INTERNO",
+                            "600",
                             "Error ejecutando diagnóstico: " + e.getMessage()
                     ))
             );

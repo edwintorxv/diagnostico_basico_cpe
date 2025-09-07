@@ -1,10 +1,22 @@
 package co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+@JsonPropertyOrder({
+        "devicesn",
+        "source",
+        "OUI",
+        "modelname",
+        "names",
+        "values",
+        "attributes",
+        "creator",
+        "appid",
+        "keyOrTree"
+})
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

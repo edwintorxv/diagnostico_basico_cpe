@@ -41,7 +41,7 @@ public class CanalWifiValidator {
         String estado5 = extraerEstado(response, param5);
 
         // 4. Validar que al menos uno esté encendido
-        return estaEncendido(estado24) || estaEncendido(estado5);
+        return estaEncendido(estado24) && estaEncendido(estado5);
     }
 
     private String extraerEstado(DeviceParamsResponse response, String nombre) {

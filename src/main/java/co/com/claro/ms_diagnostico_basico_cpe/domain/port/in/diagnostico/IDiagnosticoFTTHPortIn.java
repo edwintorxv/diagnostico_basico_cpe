@@ -6,4 +6,7 @@ public interface IDiagnosticoFTTHPortIn {
 
     DiagnosticoResponse diagnosticoTopologiaFtth(String cuentaCliente) throws Exception;
 
+
+
+
 }
