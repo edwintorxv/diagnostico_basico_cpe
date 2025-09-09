@@ -55,11 +55,11 @@ public class Constantes {
     public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO = "hfc_online_con_ultrawifi_canales_offline_codigo";
     public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION = "hfc_online_con_ultrawifi_canales_offline_descripcion";
 
-    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO = "hfc_online_con_ultrawifi_canales_online_ap_ont_codigo";
-    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION = "hfc_online_con_ultrawifi_canales_online_ap_ont_descripcion";
+    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_CODIGO = "hfc_online_con_ultrawifi_canales_online_codigo";
+    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_DESCRIPCION = "hfc_online_con_ultrawifi_canales_online_descripcion";
 
-    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO = "hfc_online_con_ultrawifi_canales_offline_ont_online_ap_codigo";
-    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION = "hfc_online_con_ultrawifi_canales_offline_ont_online_ap_descripcion";
+    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONLINE_CM_CODIGO = "hfc_online_con_ultrawifi_canales_offline_cm_online_codigo";
+    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONLINE_CM_DESCRIPCION = "hfc_online_con_ultrawifi_canales_offline_cm_online_descripcion";
 
     public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO = "ont_online_con_ultrawifi_no_detecta_ap_maestro_codigo";
     public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION = "ont_online_con_ultrawifi_no_detecta_ap_maestro_descripcion";

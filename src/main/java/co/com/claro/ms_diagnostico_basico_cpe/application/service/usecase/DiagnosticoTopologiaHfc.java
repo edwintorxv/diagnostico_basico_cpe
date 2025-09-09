@@ -64,8 +64,8 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
 
         if (getCmData == null || getCmData.isEmpty()) {
             return HelperMesh.diagnostico(cuentaCliente,
-                    "300",
-                    "No es posible consultar el CM");
+            		Constantes.HFC_NO_ONLINE_CODIGO,
+            		Constantes.HFC_NO_ONLINE_DESCRIPCION);
         }
 
         ResponseCmDataPollerDto getEstadoBandas = (ResponseCmDataPollerDto) getCmData.get(0);
