@@ -21,5 +21,7 @@ public interface IPollerPortOut {
 
     ResponseCableModemDataDto obtenerDataCableModem(RequestCableModemDataDto requestCableModemDataDto) throws Exception;
 
+    ResponseRealTimeMeasurementDto obetnerNiveles(RequestRealTimeMeasurementDto requestRealTimeMeasurementDto);
+
 
 }

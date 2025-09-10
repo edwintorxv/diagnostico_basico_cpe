@@ -12,7 +12,7 @@ public class DiagnosticoHfcLineaBaseDto {
     private String idDiagnostico;
     private String descripcion;
     private String cuentaCliente;
-    private String estadoOnt;
+    private String estadoCm;
     private String estadoVecinos;
 
 }
