@@ -185,4 +185,28 @@ public class PollerAdapter implements IPollerPortOut {
 
         }
     }
+
+    @Override
+    public ResponseRealTimeMeasurementDto obetnerNiveles(RequestRealTimeMeasurementDto requestRealTimeMeasurementDto) {
+
+        try {
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<RequestRealTimeMeasurementDto> entity = new HttpEntity<>(requestRealTimeMeasurementDto, httpHeaders);
+
+            ResponseEntity<ResponseRealTimeMeasurementDto> response = restTemplate
+                    .exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_REALTIME_MEASUREMENTS,
+                                    Transaction.startTransaction()),
+                            HttpMethod.POST, entity, ResponseRealTimeMeasurementDto.class);
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+
+        }
+    }
 }
