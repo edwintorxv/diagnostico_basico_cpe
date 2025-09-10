@@ -55,11 +55,11 @@ public class Constantes {
     public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO = "hfc_online_con_ultrawifi_canales_offline_codigo";
     public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION = "hfc_online_con_ultrawifi_canales_offline_descripcion";
 
-    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO = "hfc_online_con_ultrawifi_canales_online_ap_ont_codigo";
-    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION = "hfc_online_con_ultrawifi_canales_online_ap_ont_descripcion";
+    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_CODIGO = "hfc_online_con_ultrawifi_canales_online_codigo";
+    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_DESCRIPCION = "hfc_online_con_ultrawifi_canales_online_descripcion";
 
-    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO = "hfc_online_con_ultrawifi_canales_offline_ont_online_ap_codigo";
-    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION = "hfc_online_con_ultrawifi_canales_offline_ont_online_ap_descripcion";
+    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONLINE_CM_CODIGO = "hfc_online_con_ultrawifi_canales_offline_cm_online_codigo";
+    public static final String HFC_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONLINE_CM_DESCRIPCION = "hfc_online_con_ultrawifi_canales_offline_cm_online_descripcion";
 
     public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_CODIGO = "ont_online_con_ultrawifi_no_detecta_ap_maestro_codigo";
     public static final String ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION = "ont_online_con_ultrawifi_no_detecta_ap_maestro_descripcion";
@@ -74,12 +74,60 @@ public class Constantes {
     public static final String ACS_NO_REPORTA_DATA_DESCRIPCION = "acs_no_reporta_data_descripcion";
 
 
+    public static final String HFC_LINEA_BASE_NO_MASIVO_CODIGO ="hfc.linea.base.no.masivo.codigo";
+    public static final String HFC_LINEA_BASE_NO_MASIVO_DESCRIPCION = "hfc.linea.base.no.masivo.descripcion";
+
+    public static final String HFC_LINEA_BASE_MASIVO_CODIGO = "hfc.linea.base.masivo.codigo";
+    public static final String HFC_LINEA_BASE_MASIVO_DESCRIPCION = "hfc.linea.base.masivo.descripcion";
+
+    public static final String HFC_LINEA_BASE_UPTIME_MAYOR_CODIGO = "hfc.linea.base.uptime.mayor.codigo";
+    public static final String HFC_LINEA_BASE_UPTIME_MAYOR_DESCRIPCION = "hfc.linea.base.uptime.mayor.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_CORRECTA_CODIGO = "hfc.linea.base.cm.correcta.codigo";
+    public static final String HFC_LINEA_BASE_CM_CORRECTA_DESCRIPCION = "hfc.linea.base.cm.correcta.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_DESPOSICIONADO_CODIGO = "hfc.linea.base.cm.desposicionado.codigo";
+    public static final String HFC_LINEA_BASE_CM_DESPOSICIONADO_DESCRIPCION = "hfc.linea.base.cm.desposicionado.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_ESCALAMIENTO_NIVEL_DOS_CODIGO = "hfc.linea.base.cm.escalamiento.nivel.dos.codigo";
+    public static final String HFC_LINEA_BASE_CM_ESCALAMIENTO_NIVEL_DOS_DESCRIPCION = "hfc.linea.base.cm.escalamiento.nivel.dos.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_CASO_PUNTUAL_CODIGO = "hfc.linea.base.cm.caso.puntual.codigo";
+    public static final String HFC_LINEA_BASE_CM_CASO_PUNTUAL_DESCRICION = "hfc.linea.base.cm.caso.puntual.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_INVENTARIO_NO_ENCONTRADO_CODIGO = "hfc.linea.base.cm.inventario.no.encontrado.codigo";
+    public static final String HFC_LINEA_BASE_CM_INVENTARIO_NO_ENCONTRADO_DESCRIPCION = "hfc.linea.base.cm.inventario.no.encontrado.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_ACS_NO_REPORTA_DATA_CODIGO = "hfc.linea.base.cm.acs.no.reporta.data.codigo";
+    public static final String HFC_LINEA_BASE_CM_ACS_NO_REPORTA_DATA_DESCRIPCION = "hfc.linea.base.cm.acs.no.reporta.data.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_ACS_NO_REPORTA_VECINOS_CODIGO = "hfc.linea.base.cm.acs.no.reporta.vecinos.codigo";
+    public static final String HFC_LINEA_BASE_CM_ACS_NO_REPORTA_VECINOS_DESCRIPCION = "hfc.linea.base.cm.acs.no.reporta.vecinos.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_OFFLINE = "hfc.linea.base.cm.offline";
+    public static final String HFC_LINEA_BASE_CM_ONLINE = "hfc.linea.base.cm.online";
+
+    public static final String HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS = "hfc.linea.base.cm.no.valida.vecionos";
+
+    public static final String HFC_LINEA_BASE_CM_ACS_NO_REPORTA_APROVISIONAMIENTO_CODIGO = "hfc.linea.base.cm.acs.no.reporta.aprovisionamiento.codigo";
+    public static final String HFC_LINEA_BASE_CM_ACS_NO_REPORTA_APROVISIONAMIENTO_DESCRIPCION = "hfc.linea.base.cm.acs.no.reporta.aprovisionamiento.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_POLLER_NO_REPORTA_DATA_CODIGO = "hfc.linea.base.cm.acs.no.reporta.aprovisionamiento.codigo";
+    public static final String HFC_LINEA_BASE_CM_POLLER_NO_REPORTA_DATA_DESCRIPCION = "hfc.linea.base.cm.acs.no.reporta.aprovisionamiento.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_ACS_NO_REPORTA_MEASUREMENT_CODIGO = "hfc.linea.base.cm.acs.no.reporta.realtimeMeasurement.codigo";
+    public static final String HFC_LINEA_BASE_CM_ACS_NO_REPORTA_MEASUREMENT_DESCRIPCION = "hfc.linea.base.cm.acs.no.reporta.realtimeMeasurement.descripcion";
+
+    public static final String HFC_LINEA_BASE_CM_CUENTA_NO_HFC_CODIGO = "hfc.linea.base.cm.cuenta.no.hfc.codigo";
+    public static final String HFC_LINEA_BASE_CM_CUENTA_NO_HFC_DESCRIPCION = "hfc.linea.base.cm.cuenta.no.hfc.descripcion";
+
 
 
     public static final String POLLER_SERVICE_URL = "poller_service_url";
     public static final String POLLER_SERVICE_NEIGHBORS = "poller.service.neighborsStatus";
     public static final String POLLER_SERVICE_PROVISIONING_DATA = "poller.service.provisioning.data";
     public static final String POLLER_SERVICE_CABLE_MODEM_DATA = "poller.service.cable.modem.data";
+    public static final String POLLER_SERVICE_REALTIME_MEASUREMENTS = "poller.service.realtime.measurements";
     public static final String POLLER_SERVICE_ARP_URL = "poller_service_arp_url";
     public static final String POLLER_SERVICE_GETESTADOCM_URL = "poller_service_getestadocm_url";
     public static final String POLLER_SERVICE_GETCONSULTABANDA_URL = "poller_service_getconsultabanda_url";
