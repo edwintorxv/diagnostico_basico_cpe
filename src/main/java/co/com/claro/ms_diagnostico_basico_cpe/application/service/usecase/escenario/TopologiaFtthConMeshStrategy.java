@@ -97,8 +97,8 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             DeviceParamsResponse responseOnt = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoOnt);
             if (HelperMesh.isAcsDataEmpty(responseOnt)) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                        Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-                        Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
+                		ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO,transaction) ,
+                		ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION,transaction) );
             }
 
             List<String> macsOnt = HelperMesh.normalizarListaMac(

@@ -63,8 +63,8 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
 
         if (getCmData == null || getCmData.isEmpty()) {
             return HelperMesh.diagnostico(cuentaCliente,
-            		Constantes.HFC_NO_ONLINE_CODIGO,
-            		Constantes.HFC_NO_ONLINE_DESCRIPCION);
+            		ParametersConfig.getPropertyValue(Constantes.HFC_NO_ONLINE_CODIGO,transaction),
+            		ParametersConfig.getPropertyValue(Constantes.HFC_NO_ONLINE_DESCRIPCION, transaction));
         }
 
         ResponseCmDataPollerDto getEstadoBandas = (ResponseCmDataPollerDto) getCmData.get(0);
