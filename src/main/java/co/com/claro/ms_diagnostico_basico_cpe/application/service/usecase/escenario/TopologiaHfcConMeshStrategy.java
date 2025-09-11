@@ -133,8 +133,9 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
                     
 
                     if (HelperMesh.isAcsDataEmpty(responseMesh)) {
-                        return HelperMesh.diagnostico(cuentaCliente, Constantes.ACS_NO_REPORTA_DATA_CODIGO,
-                                Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION);
+                        return HelperMesh.diagnostico(cuentaCliente, 
+                        		ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, transaction),
+                        		ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, transaction));
                     } 
 
                     List<String> macsMesh = HelperMesh.normalizarListaMac(
@@ -142,8 +143,8 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
                     
                     if (macsMesh.stream().filter(seriales::contains).count() == 0) {
                         return HelperMesh.diagnostico(cuentaCliente,
-                                ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO, transaction),
-                                ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION, transaction));
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION, transaction));
                     }
 
                   
