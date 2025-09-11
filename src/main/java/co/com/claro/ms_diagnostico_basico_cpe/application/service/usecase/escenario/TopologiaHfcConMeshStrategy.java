@@ -178,12 +178,12 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
             String codigo;
             String descripcion;
             try {
-                codigo = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction);
+                codigo = ParametersConfig.getPropertyValue(Constantes.HFC_INVENTARIO_NO_ENCONTRADO_CODIGO, transaction);
                 descripcion = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
                         .replace("{}", cuentaCliente);
             } catch (Exception ex2) {
                 // fallback por si falla la lectura del properties
-                codigo = Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO;
+                codigo = Constantes.HFC_INVENTARIO_NO_ENCONTRADO_CODIGO;
                 descripcion = Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION.replace("{}", cuentaCliente);
             }
 
