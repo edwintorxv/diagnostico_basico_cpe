@@ -65,9 +65,17 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
             List<String> seriales = equipos.stream().map(HelperMesh::serialInventarioNormalizado) // toma serialNumber o
                     // serialMac
                     .filter(Objects::nonNull).toList();
-
-            List<ResponseArpPollerDto> listaArp = pollerPortOut
-                    .consultarARP(HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac()));
+            List<ResponseArpPollerDto> listaArp = null; 
+            
+            try {
+	            listaArp = pollerPortOut
+	                    .consultarARP(HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac()));
+            } catch (Exception e) {
+            	return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_MENSAJE, transaction));
+            	
+            }
 
             if (listaArp == null || listaArp.isEmpty()) {
                 return HelperMesh.diagnostico(cuentaCliente,
