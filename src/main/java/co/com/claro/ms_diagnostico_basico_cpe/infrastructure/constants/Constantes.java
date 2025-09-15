@@ -72,6 +72,10 @@ public class Constantes {
     
     public static final String HFC_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO = "hfc_online_con_ultrawifi_sin_ap_esclavo_codigo";
     public static final String HFC_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION = "hfc_online_con_ultrawifi_sin_ap_esclavo_descripcion";
+    public static final String HFC_INVENTARIO_NO_ENCONTRADO_CODIGO= "hfc_inventario_no_encontrado_codigo";
+    public static final String HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_CODIGO= "hfc_acs_no_cumple_estructura_esperada_codigo";
+    public static final String HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_MENSAJE= "hfc_acs_no_cumple_estructura_esperada_mensaje";
+    
     
     public static final String ACS_NO_REPORTA_DATA_CODIGO = "acs_no_reporta_data_codigo";
     public static final String ACS_NO_REPORTA_DATA_DESCRIPCION = "acs_no_reporta_data_descripcion";
