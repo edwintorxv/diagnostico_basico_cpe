@@ -65,9 +65,17 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
             List<String> seriales = equipos.stream().map(HelperMesh::serialInventarioNormalizado) // toma serialNumber o
                     // serialMac
                     .filter(Objects::nonNull).toList();
-
-            List<ResponseArpPollerDto> listaArp = pollerPortOut
-                    .consultarARP(HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac()));
+            List<ResponseArpPollerDto> listaArp = null; 
+            
+            try {
+	            listaArp = pollerPortOut
+	                    .consultarARP(HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac()));
+            } catch (Exception e) {
+            	return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_MENSAJE, transaction));
+            	
+            }
 
             if (listaArp == null || listaArp.isEmpty()) {
                 return HelperMesh.diagnostico(cuentaCliente,
@@ -119,18 +127,19 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
                             .consultarParametrosDispositivo(dtoMesh);
                     
                     boolean wifiHFCOk = canalWifiValidator.validar(responseMesh, dtoMesh.getKeyOrTree());
-                    boolean wifiCM;
+                    boolean wifiCM ;
                     
                     String formatearMac = HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac());
                     
                     List<ResponseGetWifiData> getWifiData = pollerPortOut.consultarCMBandas(formatearMac);
-                    
-                    if ("false".equalsIgnoreCase(getWifiData.get(0).getEnableWireless())) {
-                    	wifiCM = false;
-                    }else {
-                    	wifiCM = true;
+                 
+                    if (getWifiData == null || getWifiData.isEmpty()) {
+                        wifiCM = false; 
+
+                    } else {
+                        wifiCM = getWifiData.stream()
+                                            .allMatch(wifi -> "true".equalsIgnoreCase(wifi.getEnableWireless()));
                     }
-                    
 
                     if (HelperMesh.isAcsDataEmpty(responseMesh)) {
                         return HelperMesh.diagnostico(cuentaCliente, 
@@ -178,12 +187,12 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
             String codigo;
             String descripcion;
             try {
-                codigo = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction);
+                codigo = ParametersConfig.getPropertyValue(Constantes.HFC_INVENTARIO_NO_ENCONTRADO_CODIGO, transaction);
                 descripcion = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
                         .replace("{}", cuentaCliente);
             } catch (Exception ex2) {
                 // fallback por si falla la lectura del properties
-                codigo = Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO;
+                codigo = Constantes.HFC_INVENTARIO_NO_ENCONTRADO_CODIGO;
                 descripcion = Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION.replace("{}", cuentaCliente);
             }
 
