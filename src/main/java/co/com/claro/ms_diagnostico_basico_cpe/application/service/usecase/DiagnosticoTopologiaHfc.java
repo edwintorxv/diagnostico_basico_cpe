@@ -94,7 +94,7 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
         InventarioPorTopoligiaDto inventarioTopologiaHfc =
                 inventarioPoller.consultarInventario(cuentaCliente, "hfc");
 
-        DiagnosticoHfcLineaBaseResponse response = new DiagnosticoHfcLineaBaseResponse();
+        //DiagnosticoHfcLineaBaseResponse response = new DiagnosticoHfcLineaBaseResponse();
 
         if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
 

@@ -127,18 +127,19 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
                             .consultarParametrosDispositivo(dtoMesh);
                     
                     boolean wifiHFCOk = canalWifiValidator.validar(responseMesh, dtoMesh.getKeyOrTree());
-                    boolean wifiCM;
+                    boolean wifiCM ;
                     
                     String formatearMac = HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac());
                     
                     List<ResponseGetWifiData> getWifiData = pollerPortOut.consultarCMBandas(formatearMac);
-                    
-                    if ("false".equalsIgnoreCase(getWifiData.get(0).getEnableWireless())) {
-                    	wifiCM = false;
-                    }else {
-                    	wifiCM = true;
+                 
+                    if (getWifiData == null || getWifiData.isEmpty()) {
+                        wifiCM = false; 
+
+                    } else {
+                        wifiCM = getWifiData.stream()
+                                            .allMatch(wifi -> "true".equalsIgnoreCase(wifi.getEnableWireless()));
                     }
-                    
 
                     if (HelperMesh.isAcsDataEmpty(responseMesh)) {
                         return HelperMesh.diagnostico(cuentaCliente, 
