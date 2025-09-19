@@ -65,16 +65,16 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
             List<String> seriales = equipos.stream().map(HelperMesh::serialInventarioNormalizado) // toma serialNumber o
                     // serialMac
                     .filter(Objects::nonNull).toList();
-            List<ResponseArpPollerDto> listaArp = null; 
-            
+            List<ResponseArpPollerDto> listaArp = null;
+
             try {
-	            listaArp = pollerPortOut
-	                    .consultarARP(HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac()));
+                listaArp = pollerPortOut
+                        .consultarARP(HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac()));
             } catch (Exception e) {
-            	return HelperMesh.diagnostico(cuentaCliente,
+                return HelperMesh.diagnostico(cuentaCliente,
                         ParametersConfig.getPropertyValue(Constantes.HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_CODIGO, transaction),
                         ParametersConfig.getPropertyValue(Constantes.HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_MENSAJE, transaction));
-            	
+
             }
 
             if (listaArp == null || listaArp.isEmpty()) {
@@ -125,37 +125,39 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
 
                     DeviceParamsResponse responseMesh = consultarParametrosDipositivosService
                             .consultarParametrosDispositivo(dtoMesh);
-                    
+
                     boolean wifiHFCOk = canalWifiValidator.validar(responseMesh, dtoMesh.getKeyOrTree());
                     boolean wifiCM;
-                    
+
                     String formatearMac = HelperMesh.formatMacAddress(topologia.getInventarioCPE().getSerialMac());
-                    
+
                     List<ResponseGetWifiData> getWifiData = pollerPortOut.consultarCMBandas(formatearMac);
-                    
-                    if ("false".equalsIgnoreCase(getWifiData.get(0).getEnableWireless())) {
-                    	wifiCM = false;
-                    }else {
-                    	wifiCM = true;
+
+                    if (getWifiData == null || getWifiData.isEmpty()) {
+                        wifiCM = false;
+
+                    } else {
+                        wifiCM = getWifiData.stream()
+                                .allMatch(wifi -> "true".equalsIgnoreCase(wifi.getEnableWireless()));
                     }
-                    
+
 
                     if (HelperMesh.isAcsDataEmpty(responseMesh)) {
-                        return HelperMesh.diagnostico(cuentaCliente, 
-                        		ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, transaction),
-                        		ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, transaction));
-                    } 
+                        return HelperMesh.diagnostico(cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, transaction));
+                    }
 
                     List<String> macsMesh = HelperMesh.normalizarListaMac(
                             macAdreesValidator.macAddressDetectadas(responseMesh, dtoMesh.getKeyOrTree()));
-                    
+
                     if (macsMesh.stream().filter(seriales::contains).count() == 0) {
                         return HelperMesh.diagnostico(cuentaCliente,
                                 ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO, transaction),
                                 ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION, transaction));
                     }
 
-                  
+
                     if (wifiCM && wifiHFCOk) {
                         return HelperMesh.diagnostico(cuentaCliente,
                                 ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_CODIGO, transaction),
