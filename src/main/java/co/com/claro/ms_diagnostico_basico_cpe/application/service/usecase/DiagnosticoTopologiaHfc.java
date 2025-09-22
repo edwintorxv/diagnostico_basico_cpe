@@ -50,7 +50,7 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                     List.of(new DiagnosticoDto(
                             cuentaCliente,
-                            ParametersConfig.getPropertyValue(Constantes.HFC_INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
+                            ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
                                     .replace("{}", cuentaCliente)
                     ))

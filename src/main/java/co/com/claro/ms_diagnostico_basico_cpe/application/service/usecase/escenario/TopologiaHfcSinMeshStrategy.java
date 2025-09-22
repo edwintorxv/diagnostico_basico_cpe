@@ -31,31 +31,31 @@ public class TopologiaHfcSinMeshStrategy implements DiagnosticoTopologiaHfcStrat
         List<ResponseGetWifiData> getWifiData = pollerPortOut.consultarCMBandas(formatearMac);
 
         if (getWifiData == null || getWifiData.isEmpty()) {
-            return HelperMesh.diagnostico(
+        	return HelperMesh.diagnostico(
                     cuentaCliente,
                     ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_SIN_ULTRAWIFI_CANALES_DESHABILITADOS_CODIGO, transaction),
                     ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_SIN_ULTRAWIFI_CANALES_DESHABILITADOS_MENSAJE, transaction));
 
-        }
-
+        } 
+        
         boolean bandas = getWifiData.stream()
-                .allMatch(banda -> "true".equalsIgnoreCase(banda.getEnableWireless()));
-
+        .allMatch(banda -> "true".equalsIgnoreCase(banda.getEnableWireless()));
+        
         if (bandas) {
-
-            return HelperMesh.diagnostico(
+        	
+        	return HelperMesh.diagnostico(
                     cuentaCliente,
                     ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_SIN_ULTRAWIFI_TOPOLOGIA_CORRECTA_CODIGO, transaction),
                     ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_SIN_ULTRAWIFI_TOPOLOGIA_CORRECTA_MENSAJE, transaction));
-
+            
         } else {
-
-            return HelperMesh.diagnostico(
+        	
+        	return HelperMesh.diagnostico(
                     cuentaCliente,
                     ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_SIN_ULTRAWIFI_CANALES_DESHABILITADOS_CODIGO, transaction),
                     ParametersConfig.getPropertyValue(Constantes.HFC_ONLINE_SIN_ULTRAWIFI_CANALES_DESHABILITADOS_MENSAJE, transaction));
 
-
+            
         }
 
     }
