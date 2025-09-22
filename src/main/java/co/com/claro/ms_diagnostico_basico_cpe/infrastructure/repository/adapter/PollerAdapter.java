@@ -81,6 +81,7 @@ public class PollerAdapter implements IPollerPortOut {
             ResponseCmDataDto apiResponse = restTemplate.getForObject(finalUrl, ResponseCmDataDto.class);
 
             if (apiResponse != null && apiResponse.getData() != null) {
+
                 return apiResponse.getData();
             } else {
                 return Collections.emptyList();
