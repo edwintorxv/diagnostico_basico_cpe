@@ -1,8 +1,6 @@
 package co.com.claro.ms_diagnostico_basico_cpe.infrastructure.rest;
 
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.diagnostico.IDiagnosticoHFCPortIn;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.poller.IPollerPortIn;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constantes;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.repository.adapter.DiagnosticoTopologiaHfcAdapter;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,7 @@ public class TopologiaHfcController {
 	
 	
 	@GetMapping("/topologiaHFC/{cuentaCliente}")
-    public ResponseEntity<DiagnosticoResponse> diagnosticoTopologiaHfc(@PathVariable String cuentaCliente) throws Exception{
+    public ResponseEntity<DiagnosticoFtthResponse> diagnosticoTopologiaHfc(@PathVariable String cuentaCliente) throws Exception{
         return diagnosticoAdapter.diagnosticoTopologiaHfc(cuentaCliente);
     }
 	

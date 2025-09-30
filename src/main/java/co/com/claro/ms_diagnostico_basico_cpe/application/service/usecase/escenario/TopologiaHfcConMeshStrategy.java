@@ -16,8 +16,8 @@ import co.com.claro.ms_diagnostico_basico_cpe.application.service.validator.Cana
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.validator.MacAdreesValidator;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseArpPollerDto;
@@ -43,8 +43,8 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
     }
 
     @Override
-    public DiagnosticoResponse diagnosticar(InventarioPorTopoligiaDto topologia, IPollerPortOut pollerPortOut,
-                                            IAcsPortOut acsPortOut) throws Exception {
+    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto topologia, IPollerPortOut pollerPortOut,
+                                                IAcsPortOut acsPortOut) throws Exception {
 
         String cuentaCliente = topologia.getCuentaCliente();
         Transaction transaction = Transaction.startTransaction();
@@ -196,10 +196,10 @@ public class TopologiaHfcConMeshStrategy implements DiagnosticoTopologiaHfcStrat
                 descripcion = Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION.replace("{}", cuentaCliente);
             }
 
-            return new DiagnosticoResponse(
+            return new DiagnosticoFtthResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                    List.of(new DiagnosticoDto(cuentaCliente, codigo, descripcion))
+                    List.of(new DiagnosticoFtthDto(cuentaCliente, codigo, descripcion))
             );
 
         }

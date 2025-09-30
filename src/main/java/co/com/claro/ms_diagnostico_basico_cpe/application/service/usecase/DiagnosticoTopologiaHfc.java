@@ -5,9 +5,9 @@ import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escena
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaHfcSinMeshStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperLineaBaseHfc;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperMesh;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoHfcLineaBaseResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.*;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.diagnostico.IDiagnosticoHFCPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
@@ -36,7 +36,7 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
     private final HelperLineaBaseHfc helperLineaBaseHfc;
 
     @Override
-    public DiagnosticoResponse diagnosticoTopologiaHfc(String cuentaCliente) throws Exception {
+    public DiagnosticoFtthResponse diagnosticoTopologiaHfc(String cuentaCliente) throws Exception {
 
         Transaction transaction = Transaction.startTransaction();
         cuentaCliente = HelperMesh.formatCuentaCliente(cuentaCliente);
@@ -45,10 +45,10 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                 inventarioPoller.consultarInventario(cuentaCliente, "hfc");
 
         if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
-            return new DiagnosticoResponse(
+            return new DiagnosticoFtthResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                    List.of(new DiagnosticoDto(
+                    List.of(new DiagnosticoFtthDto(
                             cuentaCliente,
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                             ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
@@ -144,9 +144,13 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                     esMasivo ? Constantes.HFC_LINEA_BASE_MASIVO_DESCRIPCION : Constantes.HFC_LINEA_BASE_NO_MASIVO_DESCRIPCION,
                     transaction);
 
+            String estadoVecinos = ParametersConfig.getPropertyValue(
+                    esMasivo ? Constantes.HFC_LINEA_BASE_CM_OFFLINE : Constantes.HFC_LINEA_BASE_CM_ONLINE,
+                    transaction);
+
             return helperLineaBaseHfc.respuestaGenerica(codigo, descripcion, cuentaCliente,
                     ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_OFFLINE, transaction),
-                    ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction));
+                    estadoVecinos);
         }
 
         //Lógica CM ONLINE alive = true

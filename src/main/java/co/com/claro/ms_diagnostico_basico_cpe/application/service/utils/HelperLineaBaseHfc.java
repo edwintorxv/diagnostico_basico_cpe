@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class HelperLineaBaseHfc {
 
-    private final IPollerPortOut pollerPortOut;
+        private final IPollerPortOut pollerPortOut;
 
 
     public ResponseCmDataPollerDto responseCmDataPollerDto(String macAddress) throws Exception {
@@ -186,12 +186,12 @@ public class HelperLineaBaseHfc {
             }
         }
 
-        return (vecinoFueradeNivel * 100.0) / lstVecinos.size() >= 80.0;
+            return (vecinoFueradeNivel * 100.0) / lstVecinos.size() >= 80.0;
     }
 
     public boolean validacionRangosCM(double tx, double rx, double snrUp, double snrDown) {
 
-        boolean txFueraRango = (tx < 3.6 || tx > 52.1);
+        boolean txFueraRango = (tx < 36.9 || tx > 52.1);
         boolean rxFueraRango = (rx < -11.1 || rx > 11.1);
         boolean snrUpFueraRango = (snrUp < 29.9);
         boolean snrDownFueraRango = (snrDown < 32.9);
