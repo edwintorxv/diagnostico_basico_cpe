@@ -81,6 +81,7 @@ public class PollerAdapter implements IPollerPortOut {
             ResponseCmDataDto apiResponse = restTemplate.getForObject(finalUrl, ResponseCmDataDto.class);
 
             if (apiResponse != null && apiResponse.getData() != null) {
+
                 return apiResponse.getData();
             } else {
                 return Collections.emptyList();
@@ -205,6 +206,76 @@ public class PollerAdapter implements IPollerPortOut {
             return response.getBody();
 
         } catch (Exception e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+
+        }
+    }
+
+    @Override
+    public ResponseOntDataDto obtenerOntData(RequestOntDataDto requestOntDataDto) throws Exception {
+        try {
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+            String url = ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_ONT_DATA, Transaction.startTransaction())
+                    + "?mac=" + requestOntDataDto.getMac();
+
+            ResponseEntity<ResponseOntDataDto> response = restTemplate
+                    .exchange(url,
+                            HttpMethod.GET, new HttpEntity<>(httpHeaders), ResponseOntDataDto.class);
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+        }
+    }
+
+    @Override
+    public ResponseNeighborStatusFtthDto obtenerVecinosFtth(RequestNeighborStatusFtthDto neighborStatusFtthDto) throws Exception {
+        try {
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<RequestNeighborStatusFtthDto> entity = new HttpEntity<>(neighborStatusFtthDto, httpHeaders);
+
+            ResponseEntity<ResponseNeighborStatusFtthDto> response = restTemplate
+                    .exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_NEIGHBOSR_STATUS_FTTH, Transaction.startTransaction()),
+                            HttpMethod.POST,
+                            entity,
+                            ResponseNeighborStatusFtthDto.class
+                    );
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+
+        }
+    }
+
+    @Override
+    public ResponseRealTimeMeasurementFtthDto obtenerNivelesComunicacion(RequestRealTimeMeasurementFtthDto requestRealTimeMeasurementFtthDto) throws Exception {
+        try {
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<RequestRealTimeMeasurementFtthDto> entity = new HttpEntity<>(requestRealTimeMeasurementFtthDto, httpHeaders);
+
+            ResponseEntity<ResponseRealTimeMeasurementFtthDto> response = restTemplate
+                    .exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_REALTIME_FTTH_MEASUREMENTS, Transaction.startTransaction()),
+                            HttpMethod.POST,
+                            entity,
+                            ResponseRealTimeMeasurementFtthDto.class
+                    );
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
             throw new RuntimeException("Error al consumir el servicio de Poller", e);
 
         }

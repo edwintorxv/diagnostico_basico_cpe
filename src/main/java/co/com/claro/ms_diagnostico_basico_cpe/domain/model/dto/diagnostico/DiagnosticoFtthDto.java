@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DiagnosticoDto {
+public class DiagnosticoFtthDto {
 
     private String account;
     private String code;

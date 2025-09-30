@@ -14,30 +14,47 @@ import java.util.List;
 @Component
 public class HelperLineaBaseHfc {
 
-    private final IPollerPortOut pollerPortOut;
+        private final IPollerPortOut pollerPortOut;
 
 
     public ResponseCmDataPollerDto responseCmDataPollerDto(String macAddress) throws Exception {
         List<ResponseCmDataPollerDto> getCmData = pollerPortOut.consultarCMData(macAddress);
-        ResponseCmDataPollerDto dataCableModem;
-        dataCableModem = getCmData.get(0);
-        return dataCableModem;
+        if (!getCmData.isEmpty()) {
+            ResponseCmDataPollerDto dataCableModem;
+            dataCableModem = getCmData.get(0);
+            return dataCableModem;
+
+        } else {
+            return null;
+        }
+
     }
 
     public List<NeighborStatusDto> obtenerListadoVecinos(ResponseCmDataPollerDto dataCableModem) throws Exception {
+
         RequestNeighborStatusDto neighborStatusDto = new RequestNeighborStatusDto();
         neighborStatusDto.setCableModemDto(dataCableModem);
         neighborStatusDto.setSamples(30);
         neighborStatusDto.setGeodistanceQuery(false);
         ResponseNeighborStatusDto responseNeighborStatusDto = pollerPortOut.obtenerVecinos(neighborStatusDto);
-        return responseNeighborStatusDto.getLstNeighbors();
+
+        if (!responseNeighborStatusDto.getLstNeighbors().isEmpty()) {
+            return responseNeighborStatusDto.getLstNeighbors();
+        } else {
+            return null;
+        }
     }
 
     public List<ProvisioningDataDto> aprovisionamientoCliente(ResponseCmDataPollerDto dataCableModem) throws Exception {
         RequestProvisioningDataDto requestProvisioningDataDto = new RequestProvisioningDataDto();
         requestProvisioningDataDto.setCableModemDto(dataCableModem);
         ResponseProvisioningDataDto responseProvisioningDataDto = pollerPortOut.obtenerAprovisionamiento(requestProvisioningDataDto);
-        return responseProvisioningDataDto.getLstProvisioningDataDto();
+
+        if (!responseProvisioningDataDto.getLstProvisioningDataDto().isEmpty()) {
+            return responseProvisioningDataDto.getLstProvisioningDataDto();
+        } else {
+            return null;
+        }
     }
 
     public List<RealTimeMeasurementDto> realTimeMeasurementDto(ResponseCmDataPollerDto dataCableModem) {
@@ -46,14 +63,25 @@ public class HelperLineaBaseHfc {
         requestRealTimeMeasurementDto.setCableModemDto(dataCableModem);
         ResponseRealTimeMeasurementDto realTimeMeasurementDto = pollerPortOut.obetnerNiveles(requestRealTimeMeasurementDto);
 
-        return realTimeMeasurementDto.getLstRealTimeRealTimeMeasurement();
+        if (!realTimeMeasurementDto.getLstRealTimeRealTimeMeasurement().isEmpty()) {
+            return realTimeMeasurementDto.getLstRealTimeRealTimeMeasurement();
+        } else {
+            return null;
+        }
+
     }
 
     public List<CableModemDataDto> datosCableModemPorModelo(ResponseCmDataPollerDto dataCableModem) throws Exception {
         RequestCableModemDataDto requestCableModemDataDto = new RequestCableModemDataDto();
         requestCableModemDataDto.setModelo(dataCableModem.getModel());
         ResponseCableModemDataDto responseCableModemDataDto = pollerPortOut.obtenerDataCableModem(requestCableModemDataDto);
-        return responseCableModemDataDto.getLstCableModemDto();
+
+        if (!responseCableModemDataDto.getLstCableModemDto().isEmpty()) {
+            return responseCableModemDataDto.getLstCableModemDto();
+        } else {
+            return null;
+        }
+
     }
 
     public double validacionRangoDeCaida(List<NeighborStatusDto> lstVecinos, ResponseCmDataPollerDto dataCableModem) {
@@ -158,12 +186,12 @@ public class HelperLineaBaseHfc {
             }
         }
 
-        return (vecinoFueradeNivel * 100.0) / lstVecinos.size() >= 80.0;
+            return (vecinoFueradeNivel * 100.0) / lstVecinos.size() >= 80.0;
     }
 
     public boolean validacionRangosCM(double tx, double rx, double snrUp, double snrDown) {
 
-        boolean txFueraRango = (tx < 3.6 || tx > 52.1);
+        boolean txFueraRango = (tx < 36.9 || tx > 52.1);
         boolean rxFueraRango = (rx < -11.1 || rx > 11.1);
         boolean snrUpFueraRango = (snrUp < 29.9);
         boolean snrDownFueraRango = (snrDown < 32.9);

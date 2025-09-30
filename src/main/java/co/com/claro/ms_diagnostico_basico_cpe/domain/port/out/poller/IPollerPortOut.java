@@ -23,5 +23,11 @@ public interface IPollerPortOut {
 
     ResponseRealTimeMeasurementDto obetnerNiveles(RequestRealTimeMeasurementDto requestRealTimeMeasurementDto);
 
+    ResponseOntDataDto obtenerOntData(RequestOntDataDto requestOntDataDto) throws Exception;
+
+    ResponseNeighborStatusFtthDto obtenerVecinosFtth(RequestNeighborStatusFtthDto neighborStatusFtthDto) throws Exception;
+
+    ResponseRealTimeMeasurementFtthDto obtenerNivelesComunicacion(RequestRealTimeMeasurementFtthDto requestRealTimeMeasurementFtthDto) throws Exception;
+
 
 }

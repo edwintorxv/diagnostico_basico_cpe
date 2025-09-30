@@ -6,8 +6,8 @@ import java.util.Objects;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.ParametersConfig;
@@ -22,11 +22,11 @@ public class HelperMesh {
     }
 
 
-    public static DiagnosticoResponse errorInventario(String cuentaCliente, Transaction transaction) throws Exception {
-        return new DiagnosticoResponse(
+    public static DiagnosticoFtthResponse errorInventario(String cuentaCliente, Transaction transaction) throws Exception {
+        return new DiagnosticoFtthResponse(
                 "OK",
                 ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                List.of(new DiagnosticoDto(
+                List.of(new DiagnosticoFtthDto(
                         cuentaCliente,
                         ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                         ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
@@ -38,7 +38,7 @@ public class HelperMesh {
     public static DeviceParamsDto buildDeviceParamsDto(String serial, String keyTemplate, String marca, String modelo) {
         DeviceParamsDto dto = new DeviceParamsDto();
         dto.setDevicesn(serial);
-        dto.setSource("1");
+        dto.setSource("0");
         dto.setOUI("");
         dto.setModelname("");
         dto.setNames(true);
@@ -50,10 +50,10 @@ public class HelperMesh {
         return dto;
     }
 
-    public static DiagnosticoResponse diagnostico(String cuenta, String codigo, String descripcion) {
-        return new DiagnosticoResponse("OK",
+    public static DiagnosticoFtthResponse diagnostico(String cuenta, String codigo, String descripcion) {
+        return new DiagnosticoFtthResponse("OK",
                 ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                List.of(new DiagnosticoDto(
+                List.of(new DiagnosticoFtthDto(
                         cuenta,
                         codigo,
                         descripcion
@@ -130,7 +130,7 @@ public class HelperMesh {
     public static String formatCuentaCliente(String cuentaCliente){
 
         int longitudCuenta = 8;
-        String formatoCuentaCliente = String.format("%1$" + longitudCuenta + "s", cuentaCliente).replace(' ', '0');
+        String formatoCuentaCliente = String.format("%1$" + longitudCuenta + "s", cuentaCliente.trim()).replace(' ', '0');
 
         return formatoCuentaCliente;
     }
