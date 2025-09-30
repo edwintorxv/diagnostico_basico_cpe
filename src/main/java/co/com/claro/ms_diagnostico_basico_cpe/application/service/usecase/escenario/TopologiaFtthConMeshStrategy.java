@@ -8,8 +8,8 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsD
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceParamsResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.DeviceStatusResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorClienteDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
@@ -42,8 +42,8 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
     }
 
     @Override
-    public DiagnosticoResponse diagnosticar(InventarioPorTopoligiaDto topologia,
-                                            IAcsPortOut acsPortOut) {
+    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto topologia,
+                                                IAcsPortOut acsPortOut) {
 
 
         final String cuentaCliente = topologia.getCuentaCliente();
@@ -97,8 +97,8 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             DeviceParamsResponse responseOnt = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoOnt);
             if (HelperMesh.isAcsDataEmpty(responseOnt)) {
                 return HelperMesh.diagnostico(cuentaCliente,
-                		ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO,transaction) ,
-                		ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION,transaction) );
+                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, transaction));
             }
 
             List<String> macsOnt = HelperMesh.normalizarListaMac(
@@ -160,50 +160,19 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
 
             boolean wifiMeshOk = canalWifiValidator.validar(responseMesh, dtoMesh.getKeyOrTree());
 
-            /*// 6) Buscar AP esclavo
-            InventarioPorClienteDto meshSlave = HelperMesh.findInventarioCoincidente(equipos, macsMesh);
-            if (meshSlave == null) {
-                return HelperMesh.errorInventario(cuentaCliente, transaction);
-            }*/
-
-            // Consultar AP esclavo
-            /*DeviceParamsDto dtoSlave = HelperMesh.buildDeviceParamsDto(
-                    HelperMesh.serialPreferido(meshSlave),
-                    Constantes.KEY_OR_TREE_MESH,
-                    meshMaster.getMarca(),
-                    meshMaster.getModelo()
-            );
-
-            DeviceParamsResponse responseSlave = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoSlave);
-            if (HelperMesh.isAcsDataEmpty(responseSlave)) {
-                return HelperMesh.diagnostico(cuentaCliente,
-                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_CODIGO, transaction),
-                        ParametersConfig.getPropertyValue(Constantes.ACS_NO_REPORTA_DATA_DESCRIPCION, transaction));
-            }
-
-            boolean wifiSlaveOk = canalWifiValidator.validar(responseSlave, dtoSlave.getKeyOrTree());
-
-            // 7) Diagnósticos finales de canales
-            if (!wifiSlaveOk) {
-                return HelperMesh.diagnostico(cuentaCliente,
-                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO, transaction),
-                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION, transaction));
-            }*/
-
             if (wifiOntOk && wifiMeshOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_CODIGO, transaction),
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_ONLINE_AP_ONT_DESCRIPCION, transaction));
-            }
-            if (!wifiOntOk && wifiMeshOk) {
+            } else if (!wifiOntOk && wifiMeshOk) {
                 return HelperMesh.diagnostico(cuentaCliente,
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_CODIGO, transaction),
                         ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_ONT_ONLINE_AP_DESCRIPCION, transaction));
+            } else {
+                return HelperMesh.diagnostico(cuentaCliente,
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_CODIGO, transaction),
+                        ParametersConfig.getPropertyValue(Constantes.FTTH_ONLINE_CON_ULTRAWIFI_CANALES_OFFLINE_DESCRIPCION, transaction));
             }
-
-            return HelperMesh.errorInventario(cuentaCliente, transaction);
-
-
         } catch (Exception e) {
             String codigo;
             String descripcion;
@@ -217,10 +186,10 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                 descripcion = Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION.replace("{}", cuentaCliente);
             }
 
-            return new DiagnosticoResponse(
+            return new DiagnosticoFtthResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
-                    List.of(new DiagnosticoDto(cuentaCliente, codigo, descripcion))
+                    List.of(new DiagnosticoFtthDto(cuentaCliente, codigo, descripcion))
             );
 
         }

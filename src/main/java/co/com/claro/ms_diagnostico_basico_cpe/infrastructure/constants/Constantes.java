@@ -69,19 +69,19 @@ public class Constantes {
 
     public static final String HFC_ONLINE_SIN_ULTRAWIFI_CANALES_DESHABILITADOS_CODIGO = "hfc_online_sin_ultrawifi_canales_deshabilitados_codigo";
     public static final String HFC_ONLINE_SIN_ULTRAWIFI_CANALES_DESHABILITADOS_MENSAJE = "hfc_online_sin_ultrawifi_canales_deshabilitados_mensaje";
-    
+
     public static final String HFC_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_CODIGO = "hfc_online_con_ultrawifi_sin_ap_esclavo_codigo";
     public static final String HFC_ONLINE_CON_ULTRAWIFI_SIN_AP_ESCLAVO_DESCRIPCION = "hfc_online_con_ultrawifi_sin_ap_esclavo_descripcion";
-    public static final String HFC_INVENTARIO_NO_ENCONTRADO_CODIGO= "hfc_inventario_no_encontrado_codigo";
-    public static final String HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_CODIGO= "hfc_acs_no_cumple_estructura_esperada_codigo";
-    public static final String HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_MENSAJE= "hfc_acs_no_cumple_estructura_esperada_mensaje";
-    
-    
+    public static final String HFC_INVENTARIO_NO_ENCONTRADO_CODIGO = "hfc_inventario_no_encontrado_codigo";
+    public static final String HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_CODIGO = "hfc_acs_no_cumple_estructura_esperada_codigo";
+    public static final String HFC_ACS_NO_CUMPLE_ESTRUCTURA_ESPERADA_MENSAJE = "hfc_acs_no_cumple_estructura_esperada_mensaje";
+
+
     public static final String ACS_NO_REPORTA_DATA_CODIGO = "acs_no_reporta_data_codigo";
     public static final String ACS_NO_REPORTA_DATA_DESCRIPCION = "acs_no_reporta_data_descripcion";
 
 
-    public static final String HFC_LINEA_BASE_NO_MASIVO_CODIGO ="hfc.linea.base.no.masivo.codigo";
+    public static final String HFC_LINEA_BASE_NO_MASIVO_CODIGO = "hfc.linea.base.no.masivo.codigo";
     public static final String HFC_LINEA_BASE_NO_MASIVO_DESCRIPCION = "hfc.linea.base.no.masivo.descripcion";
 
     public static final String HFC_LINEA_BASE_MASIVO_CODIGO = "hfc.linea.base.masivo.codigo";
@@ -129,12 +129,46 @@ public class Constantes {
     public static final String HFC_LINEA_BASE_CM_CUENTA_NO_HFC_DESCRIPCION = "hfc.linea.base.cm.cuenta.no.hfc.descripcion";
 
 
+    public static final String FTTH_LINEA_BASE_ONT_DESENGANCHADA_CODIGO ="ftth.linea.base.ont.desenganchada.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_DESENGANCHADA_DESCRIPCION ="ftth.linea.base.ont.desenganchada.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_VECINOS_OFFLINE_CODIGO ="ftth.linea.base.ont.vecinos.offline.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_VECINOS_OFFLINE_DESCRIPCION ="ftth.linea.base.ont.vecinos.offline.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_REINICIO_AUTOMATICO_CODIGO ="ftth.linea.base.ont.reinicio.automatico.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_REINICIO_AUTOMATICO_DESCRIPCION ="ftth.linea.base.ont.reinicio.automatico.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_CORECTA_CODIGO ="ftth.linea.base.ont.linea.base.corecta.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_LINEA_BASE_CORECTA_DESCRIPCION ="ftth.linea.base.ont.linea.base.corecta.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_POSIBLE_INCIDENTE_MASIVO_CODIGO ="ftth.linea.base.ont.posible.incidente.masivo.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_POSIBLE_INCIDENTE_MASIVO_DESCRIPCION ="ftth.linea.base.ont.posible.incidente.masivo.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_CASO_PUNTUAL_CODIGO ="ftth.linea.base.ont.caso.puntual.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_CASO_PUNTUAL_DESCRIPCION ="ftth.linea.base.ont.caso.puntual.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_NO_EXISTE_CODIGO ="ftth.linea.base.ont.no.existe.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_NO_EXISTE_DESCRIPCION ="ftth.linea.base.ont.no.existe.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_DATA_CODIGO ="ftth.linea.base.ont.poller.no.reporta.data.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_DATA_DESCRIPCION ="ftth.linea.base.ont.poller.no.reporta.data.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_REALTIMEMEASUREMENT_CODIGO ="ftth.linea.base.ont.poller.no.reporta.realtimeMeasurement.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_REALTIMEMEASUREMENT_DESCRIPCION ="ftth.linea.base.ont.poller.no.reporta.realtimeMeasurement.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_VECINOS_CODIGO ="ftth.linea.base.ont.poller.no.reporta.vecinos.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_VECINOS_DESCRIPCION ="ftth.linea.base.ont.poller.no.reporta.vecinos.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_OFFLINE ="ftth.linea.base.ont.offline";
+    public static final String FTTH_LINEA_BASE_ONT_ONLINE ="ftth.linea.base.ont.online";
+    public static final String FTTH_LINEA_BASE_ONT_NO_VALIDA_VECINOS ="ftth.linea.base.ont.no.valida.vecinos";
+
+
+
+
 
     public static final String POLLER_SERVICE_URL = "poller_service_url";
     public static final String POLLER_SERVICE_NEIGHBORS = "poller.service.neighborsStatus";
     public static final String POLLER_SERVICE_PROVISIONING_DATA = "poller.service.provisioning.data";
     public static final String POLLER_SERVICE_CABLE_MODEM_DATA = "poller.service.cable.modem.data";
     public static final String POLLER_SERVICE_REALTIME_MEASUREMENTS = "poller.service.realtime.measurements";
+
+    public static final String POLLER_SERVICE_REALTIME_FTTH_MEASUREMENTS = "poller.service.ftth.measurement";
+    public static final String POLLER_SERVICE_ONT_DATA = "poller.service.ftth.ontData";
+    public static final String POLLER_SERVICE_NEIGHBOSR_STATUS_FTTH = "poller.service.ftth.neighBorsStatus";
+
+
+
     public static final String POLLER_SERVICE_ARP_URL = "poller_service_arp_url";
     public static final String POLLER_SERVICE_GETESTADOCM_URL = "poller_service_getestadocm_url";
     public static final String POLLER_SERVICE_GETCONSULTABANDA_URL = "poller_service_getconsultabanda_url";
@@ -157,7 +191,6 @@ public class Constantes {
     public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_SDMC_DR1200M = "wifi_channels_diagres_diagbasic_meshs_sdmc_dr1200m";
     public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_TATUNG_WAP3518 = "wifi_channels_diagres_diagbasic_meshs_tatung_wap3518";
     public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_ZTE_H196A_V9 = "wifi_channels_diagres_diagbasic_meshs_zte_h196a_v9";
-
 
 
 }

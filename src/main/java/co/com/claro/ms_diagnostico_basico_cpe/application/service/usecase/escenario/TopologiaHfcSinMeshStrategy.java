@@ -8,7 +8,7 @@ import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.Constante
 import org.springframework.stereotype.Service;
 
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperMesh;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseGetWifiData;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
@@ -22,7 +22,7 @@ public class TopologiaHfcSinMeshStrategy implements DiagnosticoTopologiaHfcStrat
 
     //diagnosticar
     @Override
-    public DiagnosticoResponse diagnosticar(InventarioPorTopoligiaDto inventario, IPollerPortOut pollerPortOut, IAcsPortOut acsPortOut) throws Exception {
+    public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto inventario, IPollerPortOut pollerPortOut, IAcsPortOut acsPortOut) throws Exception {
 
         String cuentaCliente = inventario.getCuentaCliente();
 
