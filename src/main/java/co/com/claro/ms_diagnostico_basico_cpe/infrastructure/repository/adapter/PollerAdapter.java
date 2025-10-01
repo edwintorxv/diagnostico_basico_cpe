@@ -132,7 +132,7 @@ public class PollerAdapter implements IPollerPortOut {
             return response.getBody();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+            throw new RuntimeException("Error al consumir el servicio de Poller" + e.getMessage());
 
         }
     }
@@ -157,7 +157,7 @@ public class PollerAdapter implements IPollerPortOut {
             return response.getBody();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+            throw new RuntimeException("Error al consumir el servicio de Poller" + e.getMessage());
 
         }
 
@@ -182,7 +182,7 @@ public class PollerAdapter implements IPollerPortOut {
             return response.getBody();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+            throw new RuntimeException("Error al consumir el servicio de Poller" + e.getMessage());
 
         }
     }
@@ -206,7 +206,7 @@ public class PollerAdapter implements IPollerPortOut {
             return response.getBody();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+            throw new RuntimeException("Error al consumir el servicio de Poller" + e.getMessage());
 
         }
     }
@@ -221,6 +221,8 @@ public class PollerAdapter implements IPollerPortOut {
             String url = ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_ONT_DATA, Transaction.startTransaction())
                     + "?mac=" + requestOntDataDto.getMac();
 
+            System.out.println("url ingreso: " + url);
+
             ResponseEntity<ResponseOntDataDto> response = restTemplate
                     .exchange(url,
                             HttpMethod.GET, new HttpEntity<>(httpHeaders), ResponseOntDataDto.class);
@@ -228,7 +230,7 @@ public class PollerAdapter implements IPollerPortOut {
             return response.getBody();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+            throw new RuntimeException("Error al consumir el servicio de Poller: " + e.getMessage());
         }
     }
 
@@ -251,7 +253,7 @@ public class PollerAdapter implements IPollerPortOut {
             return response.getBody();
 
         } catch (Exception e) {
-            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+            throw new RuntimeException("Error al consumir el servicio de Poller: " + e.getMessage());
 
         }
     }
@@ -276,7 +278,7 @@ public class PollerAdapter implements IPollerPortOut {
 
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            throw new RuntimeException("Error al consumir el servicio de Poller", e);
+            throw new RuntimeException("Error al consumir el servicio de Poller" + e.getMessage());
 
         }
     }
