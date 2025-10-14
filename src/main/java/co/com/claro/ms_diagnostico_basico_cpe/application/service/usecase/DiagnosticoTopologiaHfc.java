@@ -178,12 +178,12 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                             ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
                             ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                 }
-                
+
                 //Validar niveles de comunicacion del CM
                 boolean nivelesCM = helperLineaBaseHfc.validacionNivelesCM(lstRealTimeMeasurementDto);
-                if (!nivelesCM) {
-                	
-                	//Validar niveles vecinos
+                if (nivelesCM) {
+
+                    //Validar niveles vecinos
                     boolean nivelesVecinoCM = helperLineaBaseHfc.validacionNivelesVecinos(vecinos);
                     if (!nivelesVecinoCM) {
                         String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CASO_PUNTUAL_CODIGO, transaction);
@@ -194,7 +194,7 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                                 descripcion,
                                 cuentaCliente,
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
-                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction));
 
                     } else {
 
@@ -208,9 +208,9 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                     }
-                }else {
-                	
-                	//Recuperar data del cable modem
+                } else {
+
+                    //Recuperar data del cable modem
                     List<CableModemDataDto> lstCableModemDatDto = helperLineaBaseHfc.datosCableModemPorModelo(dataCableModem);
                     if (lstCableModemDatDto == null) {
                         return helperLineaBaseHfc.respuestaGenerica(
@@ -220,8 +220,8 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                     }
-                    
-                  //Recuperar provisioningdata
+
+                    //Recuperar provisioningdata
                     List<ProvisioningDataDto> lstProvisioningData = helperLineaBaseHfc.aprovisionamientoCliente(dataCableModem);
                     if (lstProvisioningData == null) {
                         return helperLineaBaseHfc.respuestaGenerica(
@@ -231,7 +231,7 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                     }
-                    
+
                     boolean desposicionamiento = helperLineaBaseHfc.validacionDesposicionamiento(lstProvisioningData, lstCableModemDatDto);
                     if (desposicionamiento) {
                         String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_DESPOSICIONADO_CODIGO, transaction);
@@ -242,8 +242,8 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                                 cuentaCliente,
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
-                    }else {
-                    	String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CORRECTA_CODIGO, transaction);
+                    } else {
+                        String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CORRECTA_CODIGO, transaction);
                         String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CORRECTA_DESCRIPCION, transaction);
                         return helperLineaBaseHfc.respuestaGenerica(
                                 codigo,
@@ -252,7 +252,7 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                     }
-                } 
+                }
             }
         }
 

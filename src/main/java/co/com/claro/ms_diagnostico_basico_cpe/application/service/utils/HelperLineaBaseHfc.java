@@ -191,12 +191,12 @@ public class HelperLineaBaseHfc {
 
     public boolean validacionRangosCM(double tx, double rx, double snrUp, double snrDown) {
 
-        boolean txFueraRango = (tx > 36.9 && tx < 52.1);
-        boolean rxFueraRango = (rx > -11.1 && rx < 11.1);
-        boolean snrUpFueraRango = (snrUp > 29.9);
-        boolean snrDownFueraRango = (snrDown > 32.9);
+        boolean txFueraRango = (tx < 36.9 || tx > 52.1);
+        boolean rxFueraRango = (rx < -11.1 || rx > 11.1);
+        boolean snrUpFueraRango = (snrUp < 29.9);
+        boolean snrDownFueraRango = (snrDown < 32.9);
 
-        return txFueraRango && rxFueraRango && snrUpFueraRango && snrDownFueraRango;
+        return txFueraRango || rxFueraRango || snrUpFueraRango || snrDownFueraRango;
 
     }
 
