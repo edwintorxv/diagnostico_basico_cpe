@@ -208,9 +208,10 @@ public class HelperLineaBaseHfc {
 
         try {
             double aprovisionado = Double.parseDouble(lstProvisioningData.get(0).getIwDownstream());
-            double capacidadCM = Double.parseDouble(lstCableModemDatDto.get(0).getVelocidadMaxima());
+            double capacidadCM_Bytes  = Double.parseDouble(lstCableModemDatDto.get(0).getVelocidadMaxima());
+            double capacidadCM_KB = capacidadCM_Bytes / 1000.0;
 
-            return aprovisionado > capacidadCM;
+            return aprovisionado > capacidadCM_KB;
         } catch (NumberFormatException e) {
             System.err.println("Error al parsear valores de aprovisionamiento/capacidad");
             return false;

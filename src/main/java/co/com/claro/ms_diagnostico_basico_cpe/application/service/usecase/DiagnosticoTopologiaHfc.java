@@ -168,60 +168,38 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                         ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
             } else {
 
-                //Recuperar provisioningdata
-                List<ProvisioningDataDto> lstProvisioningData = helperLineaBaseHfc.aprovisionamientoCliente(dataCableModem);
-                if (lstProvisioningData == null) {
+                //Recuperar RealtimeMeasurements
+                List<RealTimeMeasurementDto> lstRealTimeMeasurementDto = helperLineaBaseHfc.realTimeMeasurementDto(dataCableModem);
+                if (lstRealTimeMeasurementDto == null) {
                     return helperLineaBaseHfc.respuestaGenerica(
-                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ACS_NO_REPORTA_APROVISIONAMIENTO_CODIGO, transaction),
-                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ACS_NO_REPORTA_APROVISIONAMIENTO_DESCRIPCION, transaction),
+                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ACS_NO_REPORTA_MEASUREMENT_CODIGO, transaction),
+                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ACS_NO_REPORTA_MEASUREMENT_DESCRIPCION, transaction),
                             cuentaCliente,
                             ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
                             ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                 }
 
+                //Validar niveles de comunicacion del CM
+                boolean nivelesCM = helperLineaBaseHfc.validacionNivelesCM(lstRealTimeMeasurementDto);
+                if (nivelesCM) {
 
-                //Recuperar data del cable modem
-                List<CableModemDataDto> lstCableModemDatDto = helperLineaBaseHfc.datosCableModemPorModelo(dataCableModem);
-                if (lstCableModemDatDto == null) {
-                    return helperLineaBaseHfc.respuestaGenerica(
-                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_POLLER_NO_REPORTA_DATA_CODIGO, transaction),
-                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_POLLER_NO_REPORTA_DATA_DESCRIPCION, transaction),
-                            cuentaCliente,
-                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
-                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
-                }
+                    //Validar niveles vecinos
+                    boolean nivelesVecinoCM = helperLineaBaseHfc.validacionNivelesVecinos(vecinos);
+                    if (!nivelesVecinoCM) {
+                        String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CASO_PUNTUAL_CODIGO, transaction);
+                        String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CASO_PUNTUAL_DESCRICION, transaction);
 
-                //Validar desposicionamiento del CM
-                boolean desposicionamiento = helperLineaBaseHfc.validacionDesposicionamiento(lstProvisioningData, lstCableModemDatDto);
-                if (desposicionamiento) {
-                    String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_DESPOSICIONADO_CODIGO, transaction);
-                    String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_DESPOSICIONADO_DESCRIPCION, transaction);
-                    return helperLineaBaseHfc.respuestaGenerica(
-                            codigo,
-                            descripcion,
-                            cuentaCliente,
-                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
-                            ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
-
-                } else {
-
-                    //Recuperar RealtimeMeasurements
-                    List<RealTimeMeasurementDto> lstRealTimeMeasurementDto = helperLineaBaseHfc.realTimeMeasurementDto(dataCableModem);
-                    if (lstRealTimeMeasurementDto == null) {
                         return helperLineaBaseHfc.respuestaGenerica(
-                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ACS_NO_REPORTA_MEASUREMENT_CODIGO, transaction),
-                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ACS_NO_REPORTA_MEASUREMENT_DESCRIPCION, transaction),
+                                codigo,
+                                descripcion,
                                 cuentaCliente,
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
-                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
-                    }
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction));
 
+                    } else {
 
-                    //Validar niveles de comunicacion del CM
-                    boolean nivelesCM = helperLineaBaseHfc.validacionNivelesCM(lstRealTimeMeasurementDto);
-                    if (!nivelesCM) {
-                        String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CORRECTA_CODIGO, transaction);
-                        String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CORRECTA_DESCRIPCION, transaction);
+                        String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ESCALAMIENTO_NIVEL_DOS_CODIGO, transaction);
+                        String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ESCALAMIENTO_NIVEL_DOS_DESCRIPCION, transaction);
 
                         return helperLineaBaseHfc.respuestaGenerica(
                                 codigo,
@@ -229,35 +207,50 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                                 cuentaCliente,
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
+                    }
+                } else {
 
+                    //Recuperar data del cable modem
+                    List<CableModemDataDto> lstCableModemDatDto = helperLineaBaseHfc.datosCableModemPorModelo(dataCableModem);
+                    if (lstCableModemDatDto == null) {
+                        return helperLineaBaseHfc.respuestaGenerica(
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_POLLER_NO_REPORTA_DATA_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_POLLER_NO_REPORTA_DATA_DESCRIPCION, transaction),
+                                cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
+                    }
+
+                    //Recuperar provisioningdata
+                    List<ProvisioningDataDto> lstProvisioningData = helperLineaBaseHfc.aprovisionamientoCliente(dataCableModem);
+                    if (lstProvisioningData == null) {
+                        return helperLineaBaseHfc.respuestaGenerica(
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ACS_NO_REPORTA_APROVISIONAMIENTO_CODIGO, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ACS_NO_REPORTA_APROVISIONAMIENTO_DESCRIPCION, transaction),
+                                cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
+                    }
+
+                    boolean desposicionamiento = helperLineaBaseHfc.validacionDesposicionamiento(lstProvisioningData, lstCableModemDatDto);
+                    if (desposicionamiento) {
+                        String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_DESPOSICIONADO_CODIGO, transaction);
+                        String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_DESPOSICIONADO_DESCRIPCION, transaction);
+                        return helperLineaBaseHfc.respuestaGenerica(
+                                codigo,
+                                descripcion,
+                                cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                     } else {
-
-                        //Validar niveles vecinos
-                        boolean nivelesVecinoCM = helperLineaBaseHfc.validacionNivelesVecinos(vecinos);
-
-                        if (!nivelesVecinoCM) {
-                            String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CASO_PUNTUAL_CODIGO, transaction);
-                            String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CASO_PUNTUAL_DESCRICION, transaction);
-
-                            return helperLineaBaseHfc.respuestaGenerica(
-                                    codigo,
-                                    descripcion,
-                                    cuentaCliente,
-                                    ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
-                                    ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
-
-                        } else {
-
-                            String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ESCALAMIENTO_NIVEL_DOS_CODIGO, transaction);
-                            String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ESCALAMIENTO_NIVEL_DOS_DESCRIPCION, transaction);
-
-                            return helperLineaBaseHfc.respuestaGenerica(
-                                    codigo,
-                                    descripcion,
-                                    cuentaCliente,
-                                    ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
-                                    ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
-                        }
+                        String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CORRECTA_CODIGO, transaction);
+                        String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_CORRECTA_DESCRIPCION, transaction);
+                        return helperLineaBaseHfc.respuestaGenerica(
+                                codigo,
+                                descripcion,
+                                cuentaCliente,
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_ONLINE, transaction),
+                                ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                     }
                 }
             }
