@@ -256,7 +256,7 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
 
             boolean upTimeMayor = helperOnt.upTime(responseOntDataDto);
 
-            if (!upTimeMayor) {
+            if (upTimeMayor) {
                 return helperDiagnosticoConectividadFtth.respuestaGenericaErrores(
                         cuentaCliente, responseOntDataDto, "501");
             } else {
