@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
-
 
 @Data
 @AllArgsConstructor
@@ -14,10 +14,10 @@ import java.util.List;
 @Builder
 public class InventarioPorTopoligiaDto {
 
-    InventarioPorClienteDto inventarioCPE;
+    private InventarioPorClienteDto inventarioCPE;
 
-    List<InventarioPorClienteDto> lstinventarioMesh;
+    @Builder.Default
+    private List<InventarioPorClienteDto> lstinventarioMesh = new ArrayList<>();
 
-    String cuentaCliente;
-
+    private String cuentaCliente;
 }

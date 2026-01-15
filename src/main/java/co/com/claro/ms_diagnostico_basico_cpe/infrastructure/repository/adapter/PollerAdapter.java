@@ -43,7 +43,11 @@ public class PollerAdapter implements IPollerPortOut {
 
             HttpEntity<InventarioPorClienteRequest> entity = new HttpEntity<>(request, httpHeaders);
 
-            ResponseEntity<InventarioPorClienteResponse> response = restTemplate.exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_URL, Transaction.startTransaction()), HttpMethod.POST, entity, InventarioPorClienteResponse.class);
+            ResponseEntity<InventarioPorClienteResponse> response =
+                    restTemplate.exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_URL,
+                            Transaction.startTransaction()), HttpMethod.POST, entity, InventarioPorClienteResponse.class);
+
+            System.out.println("Data de consulta: " + response.getBody());
 
             return response.getBody();
 
@@ -213,7 +217,10 @@ public class PollerAdapter implements IPollerPortOut {
 
     @Override
     public ResponseOntDataDto obtenerOntData(RequestOntDataDto requestOntDataDto) throws Exception {
+
+        Thread.sleep(2000);
         try {
+
             HttpHeaders httpHeaders = new HttpHeaders();
 
             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -272,6 +279,57 @@ public class PollerAdapter implements IPollerPortOut {
                             HttpMethod.POST,
                             entity,
                             ResponseRealTimeMeasurementFtthDto.class
+                    );
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al consumir el servicio de Poller" + e.getMessage());
+
+        }
+    }
+
+    @Override
+    public ResponseIpOntDto obetnerIpOnt(RequestIpOntDto requestIpOntDto) throws Exception {
+        try {
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<RequestIpOntDto> entity = new HttpEntity<>(requestIpOntDto, httpHeaders);
+
+            ResponseEntity<ResponseIpOntDto> response = restTemplate
+                    .exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_FTTH_IP_ONT, Transaction.startTransaction()),
+                            HttpMethod.POST,
+                            entity,
+                            ResponseIpOntDto.class
+                    );
+
+            return response.getBody();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new RuntimeException("Error al consumir el servicio de Poller" + e.getMessage());
+
+        }
+    }
+
+    @Override
+    public ResponseModeloSoportePruebasDto recuperarCompatibilidadPruebas(RequestModeloSoportePruebasDto requestModeloSoportePruebasDto) {
+        try {
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<RequestModeloSoportePruebasDto> entity = new HttpEntity<>(requestModeloSoportePruebasDto, httpHeaders);
+
+            ResponseEntity<ResponseModeloSoportePruebasDto> response = restTemplate
+                    .exchange(ParametersConfig.getPropertyValue(Constantes.POLLER_SERVICE_FTTH_COMPATIBILIDAD_PRUEBAS,
+                                    Transaction.startTransaction()),
+                            HttpMethod.POST,
+                            entity,
+                            ResponseModeloSoportePruebasDto.class
                     );
 
             return response.getBody();

@@ -35,6 +35,8 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
 
     private final HelperLineaBaseHfc helperLineaBaseHfc;
 
+    private boolean tieneMesh = false;
+
     @Override
     public DiagnosticoFtthResponse diagnosticoTopologiaHfc(String cuentaCliente) throws Exception {
 
@@ -93,6 +95,19 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
 
         InventarioPorTopoligiaDto inventarioTopologiaHfc =
                 inventarioPoller.consultarInventario(cuentaCliente, "hfc");
+
+        System.out.println("Invetario: " + inventarioTopologiaHfc);
+        System.out.println("inventario mesh: " + inventarioTopologiaHfc.getLstinventarioMesh());
+
+
+        if (inventarioTopologiaHfc.getLstinventarioMesh() != null
+                && !inventarioTopologiaHfc.getLstinventarioMesh().isEmpty()) {
+            tieneMesh = true;
+        } else {
+            tieneMesh = false;
+        }
+
+        System.out.println("Tiene mesh: " + tieneMesh);
 
         if (inventarioTopologiaHfc == null || inventarioTopologiaHfc.getInventarioCPE() == null) {
 
@@ -232,7 +247,7 @@ public class DiagnosticoTopologiaHfc implements IDiagnosticoHFCPortIn {
                                 ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_NO_VALIDA_VECINOS, transaction));
                     }
 
-                    boolean desposicionamiento = helperLineaBaseHfc.validacionDesposicionamiento(lstProvisioningData, lstCableModemDatDto);
+                    boolean desposicionamiento = helperLineaBaseHfc.validacionDesposicionamiento(lstProvisioningData, lstCableModemDatDto, tieneMesh, transaction);
                     if (desposicionamiento) {
                         String codigo = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_DESPOSICIONADO_CODIGO, transaction);
                         String descripcion = ParametersConfig.getPropertyValue(Constantes.HFC_LINEA_BASE_CM_DESPOSICIONADO_DESCRIPCION, transaction);

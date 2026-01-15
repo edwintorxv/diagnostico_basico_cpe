@@ -3,15 +3,16 @@ package co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.DiagnosticoTopologiaFtthStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaFtthConMeshStrategy;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.usecase.escenario.TopologiaFtthSinMeshStrategy;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperDiagnosticoConectividadFtth;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperLineaBaseFtth;
 import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperMesh;
+import co.com.claro.ms_diagnostico_basico_cpe.application.service.utils.HelperOnt;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.acs.PingCpeResponseDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoFtthResponse;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.ResponseDiagnosticoConectividadFtthDto;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.ResponseDiagnosticoFtthLineaBaseDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.InventarioPorTopoligiaDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.NeighborStatusFtthDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.RealTimeMeasurementFtthDto;
-import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.ResponseOntDataDto;
+import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.*;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.in.diagnostico.IDiagnosticoFTTHPortIn;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.acs.IAcsPortOut;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
@@ -37,7 +38,9 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
     private final TopologiaFtthSinMeshStrategy ftthSinMeshsStrategy;
     private final TopologiaFtthConMeshStrategy ftthConMeshsStrategy;
     private final HelperLineaBaseFtth helperLineaBaseFtth;
+    private final HelperOnt helperOnt;
     private final InventarioPoller inventarioPoller;
+    private final HelperDiagnosticoConectividadFtth helperDiagnosticoConectividadFtth;
 
     @Override
     public DiagnosticoFtthResponse diagnosticoTopologiaFtth(String cuentaCliente) throws Exception {
@@ -79,7 +82,7 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
                 inventarioPoller.consultarInventario(cuentaCliente, "ftth");
 
         //Validar existencia de inventario
-        if (inventrarioLineaBaseFtth == null) {
+        if (inventrarioLineaBaseFtth == null || inventrarioLineaBaseFtth.getInventarioCPE() == null) {
             return helperLineaBaseFtth.respuestaGenerica(
                     ParametersConfig.getPropertyValue(Constantes.FTTH_LINEA_BASE_ONT_NO_EXISTE_CODIGO, transaction),
                     ParametersConfig.getPropertyValue(Constantes.FTTH_LINEA_BASE_ONT_NO_EXISTE_DESCRIPCION, transaction),
@@ -94,7 +97,7 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
         formatoMacAddress = HelperMesh.formatMacAddress(inventrarioLineaBaseFtth.getInventarioCPE().getSerialMac());
 
         //Recuperar data de Ont
-        ResponseOntDataDto responseOntDataDto = helperLineaBaseFtth.ontData(formatoMacAddress);
+        ResponseOntDataDto responseOntDataDto = helperOnt.ontData(formatoMacAddress);
 
         //Validacion respuesa
         if (responseOntDataDto == null) {
@@ -144,7 +147,7 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
         }
         //Flujo ONT Alive = true
         if ("true".equalsIgnoreCase(responseOntDataDto.getData().getAlive())) {
-            boolean upTimeMayor = helperLineaBaseFtth.upTime(responseOntDataDto);
+            boolean upTimeMayor = helperOnt.upTime(responseOntDataDto);
 
             if (upTimeMayor) {
                 return helperLineaBaseFtth.respuestaGenerica(
@@ -205,5 +208,87 @@ public class DiagnosticoTopologiaFtth implements IDiagnosticoFTTHPortIn {
                 ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction),
                 ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
         );
+    }
+
+    @Override
+    public ResponseDiagnosticoConectividadFtthDto diagnosticoConectividad(String cuentaCliente) throws Exception {
+
+        cuentaCliente = HelperMesh.formatCuentaCliente(cuentaCliente);
+
+        //Recuperar inventario
+        InventarioPorTopoligiaDto inventrarioLineaBaseFtth =
+                inventarioPoller.consultarInventario(cuentaCliente, "ftth");
+
+        //Validar existencia de inventario
+        if (inventrarioLineaBaseFtth == null || inventrarioLineaBaseFtth.getInventarioCPE() == null) {
+            return helperDiagnosticoConectividadFtth.respuestaValdacionesFuncionales(cuentaCliente,
+                    ParametersConfig.getPropertyValue(Constantes.FTTH_DIAGNOSTICO_CONECTIVIDAD_CUENTA_NO_EXISTE_CODIGO, transaction)
+                    , ParametersConfig.getPropertyValue(Constantes.FTTH_DIAGNOSTICO_CONECTIVIDAD_CUENTA_NO_EXISTE_DESCRIPCION, transaction)
+                            .replace("{}", cuentaCliente)
+                    , ParametersConfig.getPropertyValue(Constantes.FTTH_DIAGNOSTICO_CONECTIVIDAD_CUENTA_NO_EXISTE_ESTADO_FINAL, transaction)
+            );
+        }
+
+        //Formatea MacAddress Recuperada del inventario
+        String formatoMacAddress;
+        formatoMacAddress = HelperMesh.formatMacAddress(inventrarioLineaBaseFtth.getInventarioCPE().getSerialMac());
+
+        //Recuperar data de Ont
+        ResponseOntDataDto responseOntDataDto = helperOnt.ontData(formatoMacAddress);
+
+        //Validacion respuesta
+        if (responseOntDataDto == null || responseOntDataDto.getData() == null) {
+            return helperDiagnosticoConectividadFtth.respuestaValdacionesFuncionales(
+                    cuentaCliente,
+                    ParametersConfig.getPropertyValue(Constantes.FTTH_DIAGNOSTICO_CONECTIVIDAD_ACS_NO_REPORTA_DATA_CODIGO, transaction),
+                    ParametersConfig.getPropertyValue(Constantes.FTTH_DIAGNOSTICO_CONECTIVIDAD_ACS_NO_REPORTA_DATA_DESCRIPCION, transaction),
+                    ParametersConfig.getPropertyValue(Constantes.FTTH_DIAGNOSTICO_CONECTIVIDAD_ACS_NO_REPORTA_DATA_ESTADO_FINAL, transaction)
+            );
+        }
+
+        //Flujo ONT Alive = false
+        if ("false".equalsIgnoreCase(responseOntDataDto.getData().getAlive())) {
+            return helperDiagnosticoConectividadFtth.respuestaGenericaErrores(
+                    cuentaCliente, responseOntDataDto, "507");
+        }
+
+        if ("true".equalsIgnoreCase(responseOntDataDto.getData().getAlive())) {
+
+            boolean upTimeMayor = helperOnt.upTime(responseOntDataDto);
+
+            if (!upTimeMayor) {
+                return helperDiagnosticoConectividadFtth.respuestaGenericaErrores(
+                        cuentaCliente, responseOntDataDto, "501");
+            } else {
+
+                ResponseIpOntDto responseIp = helperDiagnosticoConectividadFtth.responseIpOntDto(responseOntDataDto);
+
+                boolean ipWanValida = helperDiagnosticoConectividadFtth.validacionIpWan(responseIp.getData().getGestion());
+
+                if (!ipWanValida) {
+                    return helperDiagnosticoConectividadFtth.respuestaGenericaErrores(
+                            cuentaCliente, responseOntDataDto, "502");
+                } else {
+                    CompatibilidadPruebasDto compatibilidad =
+                            helperDiagnosticoConectividadFtth.compatibilidadPruebasDto(responseOntDataDto.getData().getModel());
+
+                    if (!compatibilidad.isPingIp() && !compatibilidad.isTrazaIp()) {
+                        return helperDiagnosticoConectividadFtth.respuestaGenericaErrores(
+                                cuentaCliente, responseOntDataDto, "506");
+                    } else {
+                        if (compatibilidad.isPingFqdn()) {
+                                return helperDiagnosticoConectividadFtth.respuestaPruebasConexionFqdn(responseOntDataDto,
+                                        cuentaCliente, responseIp.getData().getGestion());
+                        } else {
+                            String codigoRespuesta = helperDiagnosticoConectividadFtth.paquetesLatenciaPing(responseOntDataDto);
+                            return helperDiagnosticoConectividadFtth.respuestaGenericaPruebasConexion(
+                                    cuentaCliente, responseOntDataDto, codigoRespuesta);
+                        }
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 }

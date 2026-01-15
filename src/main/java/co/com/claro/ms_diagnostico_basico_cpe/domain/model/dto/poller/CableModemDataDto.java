@@ -20,5 +20,6 @@ public class CableModemDataDto {
     private String cambiar;
     private String ofrecerMesh;
     private String velocidadMaxima;
+    private int velocidadMaximaConMesh;
 
 }

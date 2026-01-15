@@ -49,34 +49,80 @@ public class AcsAdapter implements IAcsPortOut {
     public DeviceParamsResponse obtenerParametrosPorDispositivo(DeviceParamsDto dto) throws Exception {
         final String url = ParametersConfig.getPropertyValue(Constantes.ACS_SERVICE_DEVICEPARAMETERS, Transaction.startTransaction());
 
+        for (int i = 0; i < 2; i++) {
+            try {
+                String jsonPayload = objectMapper.writeValueAsString(dto);
+                Map<String, String> hd = Map.of("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+
+                ResponseEntity<String> res = utilRestClient.post(url, jsonPayload, hd, Transaction.startTransaction());
+
+                if (res.getStatusCode().is2xxSuccessful()) {
+                    return UtilJson.mapResponseToDto(res, DeviceParamsResponse.class);
+                }
+            } catch (Exception ex) {
+                if (i == 1) throw ex; // Si es el segundo intento, lanza la falla
+                Thread.sleep(1000); // Espera 1 segundo antes de reintentar (lo que simularía tu debug)
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public PingCpeResponseDto obtenerResultadoPingCPE(
+            PingCpeRequestDto pingCpeRequestDto) throws Exception {
+
+        final String url = ParametersConfig.getPropertyValue(
+                Constantes.QUERY_ACS_WS_PING_CPE,
+                Transaction.startTransaction()
+        );
         try {
-            String jsonPayload = objectMapper.writeValueAsString(dto);
+            String jsonPayload = objectMapper.writeValueAsString(pingCpeRequestDto);
+            Map<String, String> headers = Map.of(
+                    "Content-Type", MediaType.APPLICATION_JSON_VALUE
+            );
+            ResponseEntity<String> res = utilRestClient.post(
+                    url,
+                    jsonPayload,
+                    headers,
+                    Transaction.startTransaction()
+            );
+            return UtilJson.mapResponseToDto(res, PingCpeResponseDto.class);
+        } catch (HttpStatusCodeException ex) {
+            throw new Exception(
+                    "Error HTTP en consulta a ACS. Status: " + ex.getStatusCode(), ex
+            );
+        } catch (Exception ex) {
+            throw new Exception("Error inesperado al consultar ACS", ex);
+        }
+    }
+
+    @Override
+    public TraceCpeResponseDto obtenerResultadoTrace(TraceCpeRequestDto traceCpeRequestDto) throws Exception {
+        final String url = ParametersConfig.getPropertyValue(Constantes.QUERY_ACS_WS_TRACE_CPE, Transaction.startTransaction());
+
+        try {
+            String jsonPayload = objectMapper.writeValueAsString(traceCpeRequestDto);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             HttpEntity<String> requestEntity = new HttpEntity<>(jsonPayload, headers);
 
-            ResponseEntity<DeviceParamsResponse> responseEntity = restTemplate.exchange(
+            // SELECCIONAMOS SOLO UN CLIENTE (RestTemplate es el estándar en Spring)
+            ResponseEntity<TraceCpeResponseDto> responseEntity = restTemplate.exchange(
                     url,
                     HttpMethod.POST,
                     requestEntity,
-                    DeviceParamsResponse.class
+                    TraceCpeResponseDto.class
             );
 
-            DeviceParamsResponse body = responseEntity.getBody();
-
-            Map<String, String> hd = Map.of("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-
-            ResponseEntity<String> res = utilRestClient.post(url,jsonPayload,hd,Transaction.startTransaction());
-            UtilJson.toJson(res);
-            body = UtilJson.mapResponseToDto(res,DeviceParamsResponse.class);
-
-            return body;
+            return responseEntity.getBody();
 
         } catch (HttpStatusCodeException ex) {
-            throw new Exception("Error HTTP en consulta a ACS", ex);
-
+            // Es vital loguear el cuerpo del error para saber qué dice el ACS (ej: 409 Conflict o 503 Busy)
+            log.error("Error HTTP en TraceRoute: {}", ex.getResponseBodyAsString());
+            throw new Exception("Error de comunicación con el servidor de diagnóstico (ACS).", ex);
         } catch (Exception ex) {
-            throw new Exception("Error inesperado al consultar ACS", ex);
+            log.error("Error inesperado en obtenerResultadoTrace", ex);
+            throw new Exception("No se pudo completar la traza hacia el dispositivo.", ex);
         }
     }
 }

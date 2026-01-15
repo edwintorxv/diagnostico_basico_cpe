@@ -45,7 +45,6 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
     public DiagnosticoFtthResponse diagnosticar(InventarioPorTopoligiaDto topologia,
                                                 IAcsPortOut acsPortOut) {
 
-
         final String cuentaCliente = topologia.getCuentaCliente();
 
         Transaction transaction = Transaction.startTransaction();
@@ -63,12 +62,10 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
             equipos.add(cpePrincipal);
             equipos.addAll(meshList);
 
-
             List<String> seriales = equipos.stream()
                     .map(HelperMesh::serialInventarioNormalizado) // toma serialNumber o serialMac
                     .filter(Objects::nonNull)
                     .toList();
-
 
             DeviceParamsDto dtoOnt = HelperMesh.buildDeviceParamsDto(
                     cpePrincipal.getSerialNumber(),
@@ -123,7 +120,6 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                         ParametersConfig.getPropertyValue(Constantes.ONT_ONLINE_CON_ULTRAWIFI_NO_DETECTA_AP_MAESTRO_DESCRIPCION, transaction));
             }
 
-
             // Validar estado AP maestro
             if (!HelperMesh.estaOnline(HelperMesh.serialPreferido(meshMaster), acsPortOut)) {
                 return HelperMesh.diagnostico(cuentaCliente,
@@ -138,7 +134,6 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
                     HelperMesh.safeLower(meshMaster.getMarca()),
                     meshMaster.getModelo()
             );
-
 
             DeviceParamsResponse responseMesh = consultarParametrosDipositivosService.consultarParametrosDispositivo(dtoMesh);
 
@@ -176,24 +171,13 @@ public class TopologiaFtthConMeshStrategy implements DiagnosticoTopologiaFtthStr
         } catch (Exception e) {
             String codigo;
             String descripcion;
-            try {
-                codigo = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO, transaction);
-                descripcion = ParametersConfig.getPropertyValue(Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION, transaction)
-                        .replace("{}", cuentaCliente);
-            } catch (Exception ex2) {
-                // fallback por si falla la lectura del properties
-                codigo = Constantes.INVENTARIO_NO_ENCONTRADO_CODIGO;
-                descripcion = Constantes.INVENTARIO_NO_ENCONTRADO_DESCRIPCION.replace("{}", cuentaCliente);
-            }
-
+                codigo = "000";
+                descripcion = "Error no controlado, " + e.getCause().getMessage();
             return new DiagnosticoFtthResponse(
                     "OK",
                     ConstantsMessageResponse.REQUEST_PROCESSED_SUCCESSFULLY,
                     List.of(new DiagnosticoFtthDto(cuentaCliente, codigo, descripcion))
             );
-
         }
     }
-
-
 }
