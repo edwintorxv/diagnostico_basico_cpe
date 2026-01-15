@@ -129,33 +129,105 @@ public class Constantes {
     public static final String HFC_LINEA_BASE_CM_CUENTA_NO_HFC_DESCRIPCION = "hfc.linea.base.cm.cuenta.no.hfc.descripcion";
 
 
-    public static final String FTTH_LINEA_BASE_ONT_DESENGANCHADA_CODIGO ="ftth.linea.base.ont.desenganchada.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_DESENGANCHADA_DESCRIPCION ="ftth.linea.base.ont.desenganchada.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_VECINOS_OFFLINE_CODIGO ="ftth.linea.base.ont.vecinos.offline.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_VECINOS_OFFLINE_DESCRIPCION ="ftth.linea.base.ont.vecinos.offline.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_REINICIO_AUTOMATICO_CODIGO ="ftth.linea.base.ont.reinicio.automatico.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_REINICIO_AUTOMATICO_DESCRIPCION ="ftth.linea.base.ont.reinicio.automatico.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_CORECTA_CODIGO ="ftth.linea.base.ont.linea.base.corecta.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_LINEA_BASE_CORECTA_DESCRIPCION ="ftth.linea.base.ont.linea.base.corecta.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_POSIBLE_INCIDENTE_MASIVO_CODIGO ="ftth.linea.base.ont.posible.incidente.masivo.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_POSIBLE_INCIDENTE_MASIVO_DESCRIPCION ="ftth.linea.base.ont.posible.incidente.masivo.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_CASO_PUNTUAL_CODIGO ="ftth.linea.base.ont.caso.puntual.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_CASO_PUNTUAL_DESCRIPCION ="ftth.linea.base.ont.caso.puntual.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_NO_EXISTE_CODIGO ="ftth.linea.base.ont.no.existe.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_NO_EXISTE_DESCRIPCION ="ftth.linea.base.ont.no.existe.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_DATA_CODIGO ="ftth.linea.base.ont.poller.no.reporta.data.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_DATA_DESCRIPCION ="ftth.linea.base.ont.poller.no.reporta.data.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_REALTIMEMEASUREMENT_CODIGO ="ftth.linea.base.ont.poller.no.reporta.realtimeMeasurement.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_REALTIMEMEASUREMENT_DESCRIPCION ="ftth.linea.base.ont.poller.no.reporta.realtimeMeasurement.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_VECINOS_CODIGO ="ftth.linea.base.ont.poller.no.reporta.vecinos.codigo";
-    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_VECINOS_DESCRIPCION ="ftth.linea.base.ont.poller.no.reporta.vecinos.descripcion";
-    public static final String FTTH_LINEA_BASE_ONT_OFFLINE ="ftth.linea.base.ont.offline";
-    public static final String FTTH_LINEA_BASE_ONT_ONLINE ="ftth.linea.base.ont.online";
-    public static final String FTTH_LINEA_BASE_ONT_NO_VALIDA_VECINOS ="ftth.linea.base.ont.no.valida.vecinos";
+    public static final String FTTH_LINEA_BASE_ONT_DESENGANCHADA_CODIGO = "ftth.linea.base.ont.desenganchada.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_DESENGANCHADA_DESCRIPCION = "ftth.linea.base.ont.desenganchada.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_VECINOS_OFFLINE_CODIGO = "ftth.linea.base.ont.vecinos.offline.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_VECINOS_OFFLINE_DESCRIPCION = "ftth.linea.base.ont.vecinos.offline.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_REINICIO_AUTOMATICO_CODIGO = "ftth.linea.base.ont.reinicio.automatico.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_REINICIO_AUTOMATICO_DESCRIPCION = "ftth.linea.base.ont.reinicio.automatico.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_CORECTA_CODIGO = "ftth.linea.base.ont.linea.base.corecta.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_LINEA_BASE_CORECTA_DESCRIPCION = "ftth.linea.base.ont.linea.base.corecta.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_POSIBLE_INCIDENTE_MASIVO_CODIGO = "ftth.linea.base.ont.posible.incidente.masivo.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_POSIBLE_INCIDENTE_MASIVO_DESCRIPCION = "ftth.linea.base.ont.posible.incidente.masivo.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_CASO_PUNTUAL_CODIGO = "ftth.linea.base.ont.caso.puntual.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_CASO_PUNTUAL_DESCRIPCION = "ftth.linea.base.ont.caso.puntual.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_NO_EXISTE_CODIGO = "ftth.linea.base.ont.no.existe.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_NO_EXISTE_DESCRIPCION = "ftth.linea.base.ont.no.existe.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_DATA_CODIGO = "ftth.linea.base.ont.poller.no.reporta.data.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_DATA_DESCRIPCION = "ftth.linea.base.ont.poller.no.reporta.data.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_REALTIMEMEASUREMENT_CODIGO = "ftth.linea.base.ont.poller.no.reporta.realtimeMeasurement.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_REALTIMEMEASUREMENT_DESCRIPCION = "ftth.linea.base.ont.poller.no.reporta.realtimeMeasurement.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_VECINOS_CODIGO = "ftth.linea.base.ont.poller.no.reporta.vecinos.codigo";
+    public static final String FTTH_LINEA_BASE_ONT_POLLER_NO_REPORTA_VECINOS_DESCRIPCION = "ftth.linea.base.ont.poller.no.reporta.vecinos.descripcion";
+    public static final String FTTH_LINEA_BASE_ONT_OFFLINE = "ftth.linea.base.ont.offline";
+    public static final String FTTH_LINEA_BASE_ONT_ONLINE = "ftth.linea.base.ont.online";
+    public static final String FTTH_LINEA_BASE_ONT_NO_VALIDA_VECINOS = "ftth.linea.base.ont.no.valida.vecinos";
+
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_CUENTA_NO_EXISTE_CODIGO = "ftth.diagnostico.conectividad.cuenta.no.existe.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_CUENTA_NO_EXISTE_DESCRIPCION = "ftth.diagnostico.conectividad.cuenta.no.existe.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_CUENTA_NO_EXISTE_ESTADO_FINAL = "ftth.diagnostico.conectividad.cuenta.no.existe.estado.final";
+
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ACS_NO_REPORTA_DATA_CODIGO = "ftth.diagnostico.conectividad.acs.no.reporta.data.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ACS_NO_REPORTA_DATA_DESCRIPCION = "ftth.diagnostico.conectividad.cuenta.no.reporta.data.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ACS_NO_REPORTA_DATA_ESTADO_FINAL = "ftth.diagnostico.conectividad.acs.no.reporta.data.estado.final";
+
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_OFFLINE_CODIGO = "ftth.diagnostico.conectividad.ont.offline.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_OFFLINE_DESCRIPCION = "ftth.diagnostico.conectividad.ont.offline.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_OFFLINE_ESTADO_FINAL = "ftth.diagnostico.conectividad.ont.offline.estado.final";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_OFFLINE_ANALISIS_CONDICION = "ftth.diagnostico.conectividad.ont.offline.analisis.condicion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_OFFLINE_ANALISIS_CONCLUSION = "ftth.diagnostico.conectividad.ont.offline.analisis.conclucion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_OFFLINE_ACCIONES_TIPO = "ftth.diagnostico.conectividad.ont.offline.acciones.tipo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_OFFLINE_ACCIONES_NIVEL = "ftth.diagnostico.conectividad.ont.offline.acciones.nivel";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_OFFLINE_ACCIONES_MOTIVO = "ftth.diagnostico.conectividad.ont.offline.acciones.motivo";
+
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_UP_TIME_MAYOR_CODIGO = "ftth.diagnostico.conectividad.ont.up.time.mayor.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_UP_TIME_MAYOR_DESCRIPCION = "ftth.diagnostico.conectividad.ont.up.time.mayor.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_UP_TIME_MAYOR_ESTADO_FINAL = "ftth.diagnostico.conectividad.ont.up.time.mayor.estado.final";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_UP_TIME_MAYOR_ANALISIS_CONDICION = "ftth.diagnostico.conectividad.ont.up.time.mayor.analisis.condicion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_UP_TIME_MAYOR_ANALISIS_CONCLUCION = "ftth.diagnostico.conectividad.ont.up.time.mayor.analisis.conclucion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_UP_TIME_MAYOR_ACCIONES_TIPO = "ftth.diagnostico.conectividad.ont.up.time.mayor.acciones.tipo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_UP_TIME_MAYOR_ACCIONES_ACCION = "ftth.diagnostico.conectividad.ont.up.time.mayor.acciones.accion";
+
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_ERROR_IP_CODIGO = "ftth.diagnostico.conectividad.ont.error.ip.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_ERROR_IP_DESCRIPCION = "ftth.diagnostico.conectividad.ont.error.ip.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_ERROR_IP_ESTADO_FINAL = "ftth.diagnostico.conectividad.ont.error.ip.estado.final";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_ERROR_IP_ANALISIS_CONDICION = "ftth.diagnostico.conectividad.ont.error.ip.analisis.condicion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_ERROR_IP_ANALISIS_CONCLUCION = "ftth.diagnostico.conectividad.ont.error.ip.analisis.conclucion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_ERROR_IP_ACCIONES_TIPO = "ftth.diagnostico.conectividad.ont.error.ip.acciones.tipo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_ERROR_IP_ACCIONES_NIVEL = "ftth.diagnostico.conectividad.ont.error.ip.acciones.nivel";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_ERROR_IP_ACCIONES_MOTIVO = "ftth.diagnostico.conectividad.ont.error.ip.acciones.motivo";
+
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_SOPORTA_PRUEBA_PING_TRACEROUT_CODIGO = "ftth.diagnostico.conectividad.ont.no.soporta.prueba.ping.tracerout.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_SOPORTA_PRUEBA_PING_TRACEROUT_DESCRIPCION = "ftth.diagnostico.conectividad.ont.no.soporta.prueba.ping.tracerout.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_SOPORTA_PRUEBA_PING_TRACEROUT_ESTADO_FINAL = "ftth.diagnostico.conectividad.ont.no.soporta.prueba.ping.tracerout.estado.final";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_SOPORTA_PRUEBA_PING_TRACEROUT_ANALISIS_CONDICION = "ftth.diagnostico.conectividad.ont.no.soporta.prueba.ping.tracerout.analisis.condicion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_SOPORTA_PRUEBA_PING_TRACEROUT_ANALISIS_CONCLUCION = "ftth.diagnostico.conectividad.ont.no.soporta.prueba.ping.tracerout.analisis.conclucion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_SOPORTA_PRUEBA_PING_TRACEROUT_ACCIONES_TIPO = "ftth.diagnostico.conectividad.ont.no.soporta.prueba.ping.tracerout.acciones.tipo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_SOPORTA_PRUEBA_PING_TRACEROUT_ACCIONES_MOTIVO = "ftth.diagnostico.conectividad.ont.no.soporta.prueba.ping.tracerout.acciones.motivo";
 
 
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_ENCUENTRA_HOST_CODIGO = "ftth.diagnostico.conectividad.ont.no.encuentra.host.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_ENCUENTRA_HOST_DESCRIPCION = "ftth.diagnostico.conectividad.ont.no.encuentra.host.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_ENCUENTRA_HOST_ESTADO_FINAL = "ftth.diagnostico.conectividad.ont.no.encuentra.host.estado.final";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_ENCUENTRA_HOST_ANALISIS_CONDICION = "ftth.diagnostico.conectividad.ont.no.encuentra.host.analisis.condicion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_ENCUENTRA_HOST_ANALISIS_CONCLUCION = "ftth.diagnostico.conectividad.ont.no.encuentra.host.analisis.conclucion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_ENCUENTRA_HOST_ACCIONES_TIPO = "ftth.diagnostico.conectividad.ont.no.encuentra.host.acciones.tipo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_ENCUENTRA_HOST_ACCIONES_NIVEL = "ftth.diagnostico.conectividad.ont.no.encuentra.host.acciones.nivel";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_NO_ENCUENTRA_HOST_ACCIONES_MOTIVO = "ftth.diagnostico.conectividad.ont.no.encuentra.host.acciones.motivo";
 
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_VALORES_RANGOS_PERMITIDOS_CODIGO = "ftth.diagnostico.conectividad.ont.valores.rangos.permitidos.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_VALORES_RANGOS_PERMITIDOS_DESCRIPCION = "ftth.diagnostico.conectividad.ont.valores.rangos.permitidos.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_VALORES_RANGOS_PERMITIDOS_ESTADO_FINAL = "ftth.diagnostico.conectividad.ont.valores.rangos.permitidos.estado.final";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_VALORES_RANGOS_PERMITIDOS_ANALISIS_CONDCION = "ftth.diagnostico.conectividad.ont.valores.rangos.permitidos.analisis.condicion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_VALORES_RANGOS_PERMITIDOS_ANALISIS_CONCLUCION = "ftth.diagnostico.conectividad.ont.valores.rangos.permitidos.analisis.conclucion";
 
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_PERDIDA_PAQUETES_CODIGO = "ftth.diagnostico.conectividad.ont.perdida.paquetes.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_PERDIDA_PAQUETES_DESCRIPCION = "ftth.diagnostico.conectividad.ont.perdida.paquetes.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_PERDIDA_PAQUETES_ESTADO_FINAL = "ftth.diagnostico.conectividad.ont.perdida.paquetes.estado.final";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_PERDIDA_PAQUETES_ANALISIS_CONDICION = "ftth.diagnostico.conectividad.ont.perdida.paquetes.analisis.condicion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_PERDIDA_PAQUETES_ANALISIS_CONCLUCION = "ftth.diagnostico.conectividad.ont.perdida.paquetes.analisis.conclucion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_PERDIDA_PAQUETES_ACCTIONES_TIPO = "ftth.diagnostico.conectividad.ont.perdida.paquetes.acciones.tipo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_PERDIDA_PAQUETES_ACCIONES_NIVLEL = "ftth.diagnostico.conectividad.ont.perdida.paquetes.acciones.nivel";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_PERDIDA_PAQUETES_ACCIONES_MOTIVO = "ftth.diagnostico.conectividad.ont.perdida.paquetes.acciones.motivo";
+
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_FALLA_ROUTING_INTERNET_CODIGO = "ftth.diagnostico.conectividad.ont.falla.routing.internet.codigo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_FALLA_ROUTING_INTERNET_DESCRIPCION = "ftth.diagnostico.conectividad.ont.falla.routing.internet.descripcion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_FALLA_ROUTING_INTERNET_ESTADO_FINAL = "ftth.diagnostico.conectividad.ont.falla.routing.internet.estado.final";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_FALLA_ROUTING_INTERNET_ANALISIS_CONDICION = "ftth.diagnostico.conectividad.ont.falla.routing.internet.analisis.condicion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_FALLA_ROUTING_INTERNET_ANALISIS_CONCLUCION = "ftth.diagnostico.conectividad.ont.falla.routing.internet.analisis.conclucion";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_FALLA_ROUTING_INTERNET_ACCIONES_TIPO = "ftth.diagnostico.conectividad.ont.falla.routing.internet.acciones.tipo";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_FALLA_ROUTING_INTERNET_ACCIONES_NIVEL = "ftth.diagnostico.conectividad.ont.falla.routing.internet.acciones.nivel";
+    public static final String FTTH_DIAGNOSTICO_CONECTIVIDAD_ONT_FALLA_ROUTING_INTERNET_ACCIONES_MOTIVO = "ftth.diagnostico.conectividad.ont.falla.routing.internet.acciones.motivo";
 
     public static final String POLLER_SERVICE_URL = "poller_service_url";
     public static final String POLLER_SERVICE_NEIGHBORS = "poller.service.neighborsStatus";
@@ -164,9 +236,10 @@ public class Constantes {
     public static final String POLLER_SERVICE_REALTIME_MEASUREMENTS = "poller.service.realtime.measurements";
 
     public static final String POLLER_SERVICE_REALTIME_FTTH_MEASUREMENTS = "poller.service.ftth.measurement";
+    public static final String POLLER_SERVICE_FTTH_IP_ONT = "poller.service.ftth.ip.ont";
     public static final String POLLER_SERVICE_ONT_DATA = "poller.service.ftth.ontData";
     public static final String POLLER_SERVICE_NEIGHBOSR_STATUS_FTTH = "poller.service.ftth.neighBorsStatus";
-
+    public static final String POLLER_SERVICE_FTTH_COMPATIBILIDAD_PRUEBAS = "poller.service.ftth.compatibilidad.pruebas";
 
 
     public static final String POLLER_SERVICE_ARP_URL = "poller_service_arp_url";
@@ -174,23 +247,7 @@ public class Constantes {
     public static final String POLLER_SERVICE_GETCONSULTABANDA_URL = "poller_service_getconsultabanda_url";
     public static final String ACS_SERVICE_DEVICESTATUS = "acs_service_deviceStatus";
     public static final String ACS_SERVICE_DEVICEPARAMETERS = "acs_service_deviceParameters";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_ONT_HUAWEI_HG8145V5 = "wifi_channels_diagres_diagbasic_ont_huawei_hg8145v5";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_ONT_NOKIA_G_240W_G = "wifi_channels_diagres_diagbasic_ont_nokia_g_240w_g";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_ONT_SDMC_NP2035G = "wifi_channels_diagres_diagbasic_ont_sdmc_np2035g";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_ONT_SERCOMM_R8 = "wifi_channels_diagres_diagbasic_ont_sercomm_r8";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_ONT_SKYWORTH_GN543V = "wifi_channels_diagres_diagbasic_ont_skyworth_gn543v";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_ONT_ZTE_F680 = "wifi_channels_diagres_diagbasic_ont_zte_f680";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_COSHIP_M1200S = "wifi_channels_diagres_diagbasic_meshs_coship_m1200s";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_FIBERHOME_SR1021D = "wifi_channels_diagres_diagbasic_meshs_fiberhome_sr1021d";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_FIBERHOME_SR120C = "wifi_channels_diagres_diagbasic_meshs_fiberhome_sr120c";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_KAON_AR1031 = "wifi_channels_diagres_diagbasic_meshs_kaon_ar1031";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_KAON_AR3030 = "wifi_channels_diagres_diagbasic_meshs_kaon_ar3030";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_NEWLAND_NL_81 = "wifi_channels_diagres_diagbasic_meshs_newland_nl_81";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_OMNI_MW3 = "wifi_channels_diagres_diagbasic_meshs_omni_mw3";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_OMNI_MW6 = "wifi_channels_diagres_diagbasic_meshs_omni_mw6";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_SDMC_DR1200M = "wifi_channels_diagres_diagbasic_meshs_sdmc_dr1200m";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_TATUNG_WAP3518 = "wifi_channels_diagres_diagbasic_meshs_tatung_wap3518";
-    public static final String WIFI_CHANNELS_DIAGRES_DIAGBASIC_MESHS_ZTE_H196A_V9 = "wifi_channels_diagres_diagbasic_meshs_zte_h196a_v9";
-
+    public static final String QUERY_ACS_WS_PING_CPE = "query.acs.ws.ping.cpe";
+    public static final String QUERY_ACS_WS_TRACE_CPE = "query.acs.ws.trace.cpe";
 
 }

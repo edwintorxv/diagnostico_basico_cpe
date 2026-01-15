@@ -4,6 +4,7 @@ import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.Diagn
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.diagnostico.DiagnosticoHfcLineaBaseResponse;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.model.dto.poller.*;
 import co.com.claro.ms_diagnostico_basico_cpe.domain.port.out.poller.IPollerPortOut;
+import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.configuration.Transaction;
 import co.com.claro.ms_diagnostico_basico_cpe.infrastructure.constants.configuration.ConstantsMessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,9 @@ import java.util.List;
 @Component
 public class HelperLineaBaseHfc {
 
-        private final IPollerPortOut pollerPortOut;
+    private final IPollerPortOut pollerPortOut;
+
+    Transaction transaction = Transaction.startTransaction();
 
 
     public ResponseCmDataPollerDto responseCmDataPollerDto(String macAddress) throws Exception {
@@ -146,7 +149,6 @@ public class HelperLineaBaseHfc {
             milisegundos += minutos * 60L * 1000L;
             milisegundos += (long) (segundos * 1000);
 
-
         } catch (Exception e) {
             System.err.println("Error al parsear uptime: " + upTime);
         }
@@ -186,7 +188,7 @@ public class HelperLineaBaseHfc {
             }
         }
 
-            return (vecinoFueradeNivel * 100.0) / lstVecinos.size() >= 80.0;
+        return (vecinoFueradeNivel * 100.0) / lstVecinos.size() >= 80.0;
     }
 
     public boolean validacionRangosCM(double tx, double rx, double snrUp, double snrDown) {
@@ -200,18 +202,29 @@ public class HelperLineaBaseHfc {
 
     }
 
-    public boolean validacionDesposicionamiento(List<ProvisioningDataDto> lstProvisioningData, List<CableModemDataDto> lstCableModemDatDto) {
+    public boolean validacionDesposicionamiento(List<ProvisioningDataDto> lstProvisioningData,
+                                                List<CableModemDataDto> lstCableModemDatDto,
+                                                boolean tieneMesh, Transaction transaction) {
 
-        if (lstProvisioningData == null || lstProvisioningData.isEmpty() || lstCableModemDatDto == null || lstCableModemDatDto.isEmpty()) {
+        double capacidadCM_Bytes;
+
+        if (lstProvisioningData == null || lstProvisioningData.isEmpty()
+                || lstCableModemDatDto == null || lstCableModemDatDto.isEmpty()) {
             return false;
         }
-
         try {
+
+            if (tieneMesh && lstCableModemDatDto.get(0).getVelocidadMaximaConMesh() > 0) {
+                capacidadCM_Bytes = Double.parseDouble(String.valueOf(lstCableModemDatDto.get(0).getVelocidadMaximaConMesh()));
+            } else {
+                capacidadCM_Bytes = Double.parseDouble(lstCableModemDatDto.get(0).getVelocidadMaxima());
+            }
+
             double aprovisionado = Double.parseDouble(lstProvisioningData.get(0).getIwDownstream());
-            double capacidadCM_Bytes  = Double.parseDouble(lstCableModemDatDto.get(0).getVelocidadMaxima());
             double capacidadCM_KB = capacidadCM_Bytes / 1000.0;
 
             return aprovisionado > capacidadCM_KB;
+
         } catch (NumberFormatException e) {
             System.err.println("Error al parsear valores de aprovisionamiento/capacidad");
             return false;
